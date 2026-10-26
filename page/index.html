@@ -1,0 +1,992 @@
+<style>
+.ob{--ob-c1:#34527D;--ob-c2:#8FA3BF;--ob-c3:#C9545C;--ob-c4:#C7B48E;--ob-muted:#B8C2CE;
+  --color-ok:#4E8B6D;--color-warn:#B98C3E;--color-bad:#B9505A;--ob-accent:#C9545C}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .ob{--ob-c1:#7F9CC8;--ob-c2:#B4C2D6;--ob-c3:#E07A80;--ob-c4:#D6C6A2;--ob-muted:#5A6676;--color-ok:#7FB898;--color-warn:#D9B36E;--color-bad:#E0838A}}
+:root[data-theme="dark"] .ob{--ob-c1:#7F9CC8;--ob-c2:#B4C2D6;--ob-c3:#E07A80;--ob-c4:#D6C6A2;--ob-muted:#5A6676;--color-ok:#7FB898;--color-warn:#D9B36E;--color-bad:#E0838A}
+.ob-tabs button[aria-selected="true"]{border-bottom-color:var(--ob-accent) !important}
+.ob .seg button[aria-pressed="true"]{background:var(--ob-c1) !important;color:#fff !important}
+.ob-stage.hot{background:color-mix(in srgb,var(--color-warn) 7%,var(--color-panel)) !important}
+.ob{font-family:var(--font-anthropic-sans);font-size:var(--cds-font-size-body);font-variant-numeric:tabular-nums;display:flex;flex-direction:column;gap:var(--cds-gap-lg)}
+.ob .muted{color:var(--color-fg-muted)}
+.ob .cap{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.ob .c-ok{color:var(--color-ok)} .ob .c-warn{color:var(--color-warn)} .ob .c-bad{color:var(--color-bad)}
+.ob-head{display:flex;flex-wrap:wrap;gap:var(--cds-gap-md);justify-content:space-between;align-items:flex-end}
+.ob-title{font-family:var(--font-anthropic-serif);font-weight:400;font-size:var(--cds-font-size-title);margin:0;line-height:1.15}
+.ob-take{margin:6px 0 0;max-width:62rem}
+.ob-tag{display:inline-block;margin-left:8px;font-size:var(--cds-font-size-caption);padding:1px 8px;border-radius:999px;border:1px solid var(--color-border-line);color:var(--color-fg-muted);vertical-align:middle;font-family:var(--font-anthropic-sans)}
+.ob-controls{display:flex;flex-wrap:wrap;gap:var(--cds-gap-sm);align-items:flex-end}
+.ob-field{display:flex;flex-direction:column;gap:2px;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.ob-field input,.ob-field select{font:inherit;font-size:var(--cds-font-size-body);color:var(--color-fg);background:var(--color-bg);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:5px 8px;min-height:34px}
+.ob-field input[type=number]{width:72px}
+.ob-btn{font:inherit;font-size:var(--cds-font-size-caption);color:var(--color-fg);background:var(--color-bg);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:6px 12px;cursor:pointer;min-height:34px}
+.ob-fresh{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;border:1px solid var(--color-border-line);border-left:5px solid var(--color-fg-muted);border-radius:var(--cds-radius);padding:var(--cds-pad-sm) var(--cds-pad-md);background:var(--color-panel)}
+.ob-fresh.ok{border-left-color:var(--color-ok)} .ob-fresh.warn{border-left-color:var(--color-warn)} .ob-fresh.bad{border-left-color:var(--color-bad)}
+.ob-card{background:var(--color-panel);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-lg);min-width:0}
+.ob-card h2{font-size:var(--cds-font-size-heading);font-weight:var(--cds-font-weight-medium);margin:0}
+.ob-card h3{font-size:var(--cds-font-size-body);font-weight:var(--cds-font-weight-medium);margin:0}
+.ob-chead{display:flex;flex-wrap:wrap;gap:4px 16px;justify-content:space-between;align-items:baseline;margin-bottom:var(--cds-gap-md)}
+.ob-grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,26rem),1fr));gap:var(--cds-gap-md)}
+.ob-grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,17rem),1fr));gap:var(--cds-gap-md)}
+.ob-flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,10.5rem),1fr));border:1px solid var(--color-border-line);border-radius:var(--cds-radius);background:var(--color-panel);overflow:hidden}
+.ob-stage{padding:var(--cds-pad-md) var(--cds-pad-lg);border-right:1px solid var(--color-border-line);border-bottom:1px solid var(--color-border-line);min-width:0;margin:0 -1px -1px 0}
+.ob-stage.hot{background:color-mix(in srgb,var(--color-warn) 12%,var(--color-panel))}
+.ob-stage.done .ob-big{color:var(--color-ok)}
+.ob-lbl{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);font-weight:var(--cds-font-weight-medium)}
+.ob-big{font-family:var(--font-anthropic-serif);font-weight:400;font-size:var(--cds-font-size-title);line-height:1.1;margin:4px 0 2px;min-height:1.1em}
+.ob-sub{font-size:var(--cds-font-size-body)}
+.ob-note{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);margin-top:4px}
+.ob-tile{background:var(--color-bg);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-md);min-width:0}
+.ob-mini{display:grid;grid-template-columns:1fr auto;gap:2px 10px;font-size:var(--cds-font-size-caption);margin-top:8px;padding-top:6px;border-top:1px solid var(--color-border-line)}
+.ob-mini span{color:var(--color-fg-muted)} .ob-mini b{text-align:right}
+.ob-mini .h{grid-column:1/-1;font-weight:var(--cds-font-weight-medium);margin-top:4px}
+.ob-meter{height:8px;background:color-mix(in srgb,var(--color-fg) 8%,transparent);border-radius:4px;overflow:hidden;margin-top:8px}
+.ob-meter i{display:block;height:100%;width:0;border-radius:4px}
+.ob-bars{display:grid;grid-template-columns:auto 1fr auto;gap:3px 8px;align-items:center;margin-top:8px;font-size:var(--cds-font-size-caption)}
+.ob-bars span{color:var(--color-fg-muted)} .ob-bars b{text-align:right}
+.ob-bars i{display:block;height:6px;border-radius:3px;background:var(--cds-chart-status-critical)}
+.ob-chart{position:relative;width:100%;min-height:240px}
+.ob-chart svg{display:block;width:100%;height:auto;overflow:visible}
+.ob-chart text{font-family:var(--font-anthropic-sans);font-size:var(--cds-font-size-caption);fill:var(--color-fg-muted)}
+.ob-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.ob-legend span{display:inline-flex;align-items:center;gap:5px}
+.ob-legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.ob-legend i.dash{height:0;width:14px;border-top:2px dashed var(--cds-chart-reference);border-radius:0}
+.ob-tip{position:absolute;pointer-events:none;background:var(--cds-surface-popover);border:1px solid var(--cds-border);border-radius:var(--cds-radius);box-shadow:var(--cds-shadow-popover);padding:var(--cds-pad-xs) var(--cds-pad-sm);font-size:var(--cds-font-size-caption);white-space:nowrap;z-index:5}
+.ob-tip .t{color:var(--cds-text-secondary)}
+.ob-tip i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
+.ob-fail{display:flex;align-items:center;justify-content:center;gap:6px;min-height:inherit;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.ob-fail::before{content:"";width:.375rem;height:.375rem;border-radius:50%;background:var(--color-bad)}
+.ob-empty{padding:var(--cds-pad-md);border:1px dashed var(--color-border-line);border-radius:var(--cds-radius);color:var(--color-fg-muted);font-size:var(--cds-font-size-caption)}
+.ob-tw{overflow:auto;max-width:100%}
+.ob-tw.tall{max-height:520px}
+.ob table{border-collapse:collapse;width:100%;font-size:var(--cds-font-size-caption)}
+.ob th{color:var(--color-fg-muted);font-weight:var(--cds-font-weight-medium);text-align:left;padding:6px 8px;border-bottom:1px solid var(--color-border-line);white-space:nowrap;position:sticky;top:0;background:var(--color-panel);z-index:1}
+.ob td{padding:6px 8px;border-bottom:1px solid var(--color-border-line);white-space:nowrap}
+.ob .r{text-align:right}
+.ob tfoot td{font-weight:var(--cds-font-weight-medium);border-top:2px solid var(--color-fg)}
+.ob #s-table th:first-child,.ob #s-table td:first-child{position:sticky;left:0;background:var(--color-panel);z-index:2;box-shadow:1px 0 0 var(--color-border-line);max-width:16rem;overflow:hidden;text-overflow:ellipsis}
+.ob #s-table th{position:static}
+.ob #s-table th:first-child{position:sticky;top:auto;left:0;z-index:3}
+.ob .agbar{display:flex;height:14px;border-radius:4px;overflow:hidden;background:color-mix(in srgb,var(--color-fg) 8%,transparent);margin:8px 0}
+.ob .agbar i{display:block;height:100%}
+.ob .agrows{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;text-align:center;font-size:var(--cds-font-size-caption)}
+.ob .agrows div{background:var(--color-panel);border-radius:4px;padding:3px 2px}
+.ob .agrows small{display:block;color:var(--color-fg-muted)}
+.ob .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0}
+.ob .stats div{border-top:1px solid var(--color-border-line);padding-top:4px}
+.ob .stats small{display:block;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.ob .stats strong{font-size:var(--cds-font-size-heading);font-weight:var(--cds-font-weight-medium)}
+.ob .done{margin-top:10px;padding-top:8px;border-top:1px solid var(--color-border-line);font-size:var(--cds-font-size-caption)}
+.ob .agall{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr));gap:var(--cds-gap-md);margin-bottom:var(--cds-gap-md)}
+.ob .seg{display:inline-flex;border:1px solid var(--color-border-line);border-radius:var(--cds-radius);overflow:hidden}
+.ob .seg button{font:inherit;font-size:var(--cds-font-size-caption);border:0;background:var(--color-bg);color:var(--color-fg);padding:6px 14px;cursor:pointer}
+.ob .seg button[aria-pressed="true"]{background:var(--color-fg);color:var(--color-bg)}
+.ob .stack{display:flex;height:8px;border-radius:3px;overflow:hidden;background:color-mix(in srgb,var(--color-fg) 8%,transparent);margin-top:3px;min-width:60px}
+.ob .stack i{display:block;height:100%}
+.ob .ubar{display:block;height:8px;border-radius:4px;background:var(--cds-chart-muted)}
+.ob .pill{display:inline-block;padding:1px 7px;border-radius:999px;font-size:var(--cds-font-size-caption);font-weight:var(--cds-font-weight-medium)}
+.ob .pill.ok{background:color-mix(in srgb,var(--color-ok) 16%,transparent);color:var(--color-ok)}
+.ob .pill.warn{background:color-mix(in srgb,var(--color-warn) 18%,transparent);color:var(--color-warn)}
+.ob .pill.bad{background:color-mix(in srgb,var(--color-bad) 16%,transparent);color:var(--color-bad)}
+.ob .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,9.5rem),1fr));gap:var(--cds-gap-sm);margin-bottom:var(--cds-gap-md)}
+.ob .kpi{background:var(--color-bg);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-sm) var(--cds-pad-md)}
+.ob .kpi .v{font-family:var(--font-anthropic-serif);font-size:var(--cds-font-size-title);line-height:1.15}
+.ob .attn ul{list-style:none;margin:0 0 10px;padding:0;font-size:var(--cds-font-size-caption)}
+.ob .attn li{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-bottom:1px solid var(--color-border-line)}
+.ob .prog{position:relative;height:10px;background:color-mix(in srgb,var(--color-fg) 8%,transparent);border-radius:5px;min-width:90px;overflow:hidden;flex:1}
+.ob .prog i{position:absolute;left:0;top:0;bottom:0;border-radius:5px}
+.ob .strip{display:grid;grid-auto-flow:column;grid-auto-columns:8px;gap:2px}
+.ob .strip i{width:8px;height:14px;border-radius:2px;display:block}
+.ob .role{border-top:1px solid var(--color-border-line);margin-top:var(--cds-gap-md);padding-top:var(--cds-gap-md)}
+.ob .rolegrid{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(0,1fr);gap:var(--cds-gap-md)}
+@media (max-width:900px){.ob .rolegrid{grid-template-columns:1fr}}
+.ob tr.pend td{color:var(--color-fg-muted);font-style:italic}
+.ob details summary{cursor:pointer;font-size:var(--cds-font-size-caption);padding:6px 0}
+.ob-tabs{display:flex;gap:4px;border-bottom:1px solid var(--color-border-line);margin-bottom:calc(-1 * var(--cds-gap-sm))}
+.ob-tabs button{font:inherit;font-size:var(--cds-font-size-body);background:none;border:0;border-bottom:2px solid transparent;color:var(--color-fg-muted);padding:8px 14px;cursor:pointer;margin-bottom:-1px}
+.ob-tabs button[aria-selected="true"]{color:var(--color-fg);border-bottom-color:var(--color-fg);font-weight:var(--cds-font-weight-medium)}
+.ob[data-view=past] .live-only{display:none !important}
+.ob[data-view=today] .past-only{display:none !important}
+.ob[data-view=monthly] > :not(.ob-tabs):not(#monthly):not(#top){display:none !important}
+.ob[data-view=monthly] #takeaway,.ob[data-view=monthly] #controls{display:none !important}
+.ob:not([data-view=monthly]) #monthly{display:none !important}
+[data-dash-source-state=refreshing]{opacity:.5;transition:opacity var(--cds-dur-slow)}
+</style>
+
+<div class="ob" id="ob" data-view="today">
+  <div class="ob-tabs" role="tablist" aria-label="View" id="tabs"><button type="button" role="tab" id="tab-today" data-v="today" aria-selected="true">Today (live)</button><button type="button" role="tab" id="tab-yesterday" data-v="yesterday" aria-selected="false">Yesterday</button><button type="button" role="tab" id="tab-monthly" data-v="monthly" aria-selected="false">Trends (day · week · month)</button></div>
+  <header class="ob-head" id="top">
+    <div>
+      <h1 class="ob-title">Outbound floor <span class="ob-tag">B2C · NewCairo</span></h1>
+      <p class="ob-take" id="takeaway">
+        <span id="tk-day">—</span>: COT <b><span data-source="cot" data-field="cot_pct" data-row="0" data-fill="pct">—</span></b> shipped on time<span class="live-only"> so far</span><span id="tk-proj">, projected <b><span data-source="projection" data-field="proj_pct" data-row="0" data-fill="pct">—</span></b> by midnight</span>.
+        <span class="live-only"><span data-source="cot" data-field="not_shipped" data-row="0" data-fill="n">—</span> cut-off orders still to ship and
+        <span class="c-bad"><span data-source="flow" data-field="breached_open" data-row="0" data-fill="n">—</span></span> open orders already past their deadline.</span>
+        <span class="past-only"><span data-source="cot" data-field="on_time" data-row="0" data-fill="n">—</span> of <span data-source="cot" data-field="due" data-row="0" data-fill="n">—</span> cut-off orders shipped on time, <span class="c-bad"><span data-source="cot" data-field="breaches" data-row="0" data-fill="n">—</span></span> breaches; <span data-source="flow" data-field="shipped_d" data-row="0" data-fill="n">—</span> orders shipped in total.</span>
+      </p>
+    </div>
+    <div class="ob-controls" id="controls">
+      <label class="ob-field past-only">Day <input type="date" id="f-day" min="2024-01-01" max="2099-12-31"></label>
+      <label class="ob-field">Pick target / hr <input type="number" id="f-pick" min="1" step="1"></label>
+      <label class="ob-field">Pack target / hr <input type="number" id="f-pack" min="1" step="1"></label>
+      <label class="ob-field">Shift hours <input type="number" id="f-shift" min="1" max="24" step="0.5"></label>
+      <button type="button" class="ob-btn" id="f-refresh" style="border-color:var(--color-fg)">↻ Refresh data</button>
+      <button type="button" class="ob-btn" id="f-reset">Reset</button>
+    </div>
+  </header>
+
+  <div class="ob-fresh live-only" id="fresh" role="status">
+    <span><b id="fresh-head">Checking data…</b> Metabase has data up to <b data-source="flow" data-field="last_upd" data-row="0" data-fill="time">—</b><span id="fresh-lag"></span>.</span>
+    <span class="cap">Checked at <span data-source="flow" data-field="now_c" data-row="0" data-fill="time">—</span> Cairo time</span>
+  </div>
+
+  <section class="ob-flow live-only" id="flow" aria-label="Order flow by task">
+    <div class="ob-stage" data-q="wait_pick"><div class="ob-lbl">Waiting to pick</div>
+      <div class="ob-big" data-source="flow" data-field="wait_pick" data-row="0" data-fill="n">—</div>
+      <div class="ob-sub"><span data-source="flow" data-field="wait_pick_i" data-row="0" data-fill="n">—</span> items</div>
+      <div class="ob-note">Backlog <span data-source="flow" data-field="backlog" data-row="0" data-fill="n">—</span> orders, <span data-source="flow" data-field="backlog_i" data-row="0" data-fill="n">—</span> items. <span data-source="flow" data-field="on_hold" data-row="0" data-fill="n">—</span> on hold</div></div>
+    <div class="ob-stage"><div class="ob-lbl">Picking now</div>
+      <div class="ob-big" data-source="flow" data-field="picking" data-row="0" data-fill="n">—</div>
+      <div class="ob-sub"><span data-source="flow" data-field="picking_i" data-row="0" data-fill="n">—</span> items</div>
+      <div class="ob-note">Done: <span data-source="flow" data-field="picked_d" data-row="0" data-fill="n">—</span> orders, <span data-source="flow" data-field="picked_d_i" data-row="0" data-fill="n">—</span> items by <span data-source="flow" data-field="pickers_d" data-row="0" data-fill="n">—</span> pickers</div></div>
+    <div class="ob-stage" data-q="wait_pack"><div class="ob-lbl">Waiting to pack</div>
+      <div class="ob-big" data-source="flow" data-field="wait_pack" data-row="0" data-fill="n">—</div>
+      <div class="ob-sub"><span data-source="flow" data-field="wait_pack_i" data-row="0" data-fill="n">—</span> items</div>
+      </div>
+    <div class="ob-stage"><div class="ob-lbl">Packing now</div>
+      <div class="ob-big" data-source="flow" data-field="packing" data-row="0" data-fill="n">—</div>
+      <div class="ob-sub"><span data-source="flow" data-field="packing_i" data-row="0" data-fill="n">—</span> items</div>
+      <div class="ob-note">Done: <span data-source="flow" data-field="packed_d" data-row="0" data-fill="n">—</span> orders, <span data-source="flow" data-field="packed_d_i" data-row="0" data-fill="n">—</span> items by <span data-source="flow" data-field="packers_d" data-row="0" data-fill="n">—</span> packers</div></div>
+    <div class="ob-stage" data-q="wait_ship"><div class="ob-lbl">Waiting to ship</div>
+      <div class="ob-big" data-source="flow" data-field="wait_ship" data-row="0" data-fill="n">—</div>
+      <div class="ob-sub"><span data-source="flow" data-field="wait_ship_i" data-row="0" data-fill="n">—</span> items</div>
+      </div>
+    <div class="ob-stage done"><div class="ob-lbl" id="shipped-lbl">Shipped today</div>
+      <div class="ob-big" data-source="flow" data-field="shipped_d" data-row="0" data-fill="n">—</div>
+      <div class="ob-sub"><span data-source="flow" data-field="shipped_d_i" data-row="0" data-fill="n">—</span> items</div>
+      <div class="ob-note" id="shipped-note"></div></div>
+  </section>
+
+  <section class="ob-card past-only" id="day-totals">
+    <div class="ob-chead"><h2>Day totals</h2><span id="day-totals-hint" hidden></span></div>
+    <div class="ob-grid3">
+      <div class="ob-tile"><div class="ob-lbl">Picked</div><div class="ob-big" data-source="flow" data-field="picked_d" data-row="0" data-fill="n">—</div>
+        <div class="ob-sub"><span data-source="flow" data-field="picked_d_i" data-row="0" data-fill="n">—</span> items by <span data-source="flow" data-field="pickers_d" data-row="0" data-fill="n">—</span> pickers</div>
+        <div class="ob-mini"><span>Avg IPP (units / user-hour)</span><b data-source="ipp" data-field="pick_ipp" data-row="0" data-fill="d1">—</b><span>Orders / user-hour</span><b data-source="ipp" data-field="pick_ipp_o" data-row="0" data-fill="d1">—</b><span>User-hours</span><b data-source="ipp" data-field="pick_uh" data-row="0" data-fill="n">—</b></div></div>
+      <div class="ob-tile"><div class="ob-lbl">Packed</div><div class="ob-big" data-source="flow" data-field="packed_d" data-row="0" data-fill="n">—</div>
+        <div class="ob-sub"><span data-source="flow" data-field="packed_d_i" data-row="0" data-fill="n">—</span> items by <span data-source="flow" data-field="packers_d" data-row="0" data-fill="n">—</span> packers</div>
+        <div class="ob-mini"><span>Avg IPP (units / user-hour)</span><b data-source="ipp" data-field="pack_ipp" data-row="0" data-fill="d1">—</b><span>Orders / user-hour</span><b data-source="ipp" data-field="pack_ipp_o" data-row="0" data-fill="d1">—</b><span>User-hours</span><b data-source="ipp" data-field="pack_uh" data-row="0" data-fill="n">—</b></div></div>
+      <div class="ob-tile"><div class="ob-lbl">Shipped</div><div class="ob-big c-ok" data-source="flow" data-field="shipped_d" data-row="0" data-fill="n">—</div>
+        <div class="ob-sub"><span data-source="flow" data-field="shipped_d_i" data-row="0" data-fill="n">—</span> items</div></div>
+    </div>
+    <h3 style="margin:var(--cds-gap-md) 0 6px">Step times</h3>
+    <div class="ob-tw"><table id="step-times" data-source="cycle" data-row-key="stage">
+      <thead><tr><th>Step</th><th class="r" data-field="n">Orders done</th><th class="r" data-field="med_m">Median</th><th class="r" data-field="avg_m">Average</th><th class="r" data-field="in_target">Within target</th></tr></thead>
+      <tbody></tbody></table></div>
+  </section>
+
+  <section class="ob-card" id="cutoff">
+    <div class="ob-chead"><h2>Cut-off vs pendency</h2>
+      <span class="cap">Before 5 PM ships same day</span></div>
+    <div class="ob-grid3">
+      <div class="ob-tile" id="t-due"><div class="ob-lbl">Cut-off orders (due by midnight)</div>
+        <div class="ob-big"><span data-source="cot" data-field="due" data-row="0" data-fill="n">—</span></div>
+        <div class="ob-sub"><span data-source="cot" data-field="due_i" data-row="0" data-fill="n">—</span> items</div>
+        <div class="ob-mini"><span>Created the day before, after 5 PM</span><b data-source="cot" data-field="due_prev" data-row="0" data-fill="n">—</b>
+          <span>Created that day, before 5 PM</span><b data-source="cot" data-field="due_tod" data-row="0" data-fill="n">—</b></div></div>
+      <div class="ob-tile" id="t-cot"><div class="ob-lbl" id="cot-lbl">Shipped on time (COT %)</div>
+        <div class="ob-big" id="cot-big"><span data-source="cot" data-field="cot_pct" data-row="0" data-fill="pct">—</span></div>
+        <div class="ob-sub"><span data-source="cot" data-field="on_time" data-row="0" data-fill="n">—</span> orders, <span data-source="cot" data-field="on_time_i" data-row="0" data-fill="n">—</span> items</div>
+        <div class="ob-meter"><i id="cot-bar"></i></div>
+        <div class="ob-note" id="cot-today">Projected at midnight: <b data-source="projection" data-field="proj_pct" data-row="0" data-fill="pct">—</b></div>
+        <div class="ob-note" id="cot-past"><span data-source="cot" data-field="breaches" data-row="0" data-fill="n">—</span> breaches</div></div>
+      <div class="ob-tile" id="t-pend"><div class="ob-lbl" id="pend-lbl">Pendency now (not shipped)</div>
+        <div class="ob-big c-bad"><span data-source="cot" data-field="not_shipped" data-row="0" data-fill="n">—</span></div>
+        <div class="ob-sub"><span data-source="cot" data-field="not_shipped_i" data-row="0" data-fill="n">—</span> items</div>
+        <div class="ob-mini"><span class="h">Where it is now</span>
+          <span>Waiting to pick / picking</span><b data-source="cot" data-field="p_pick" data-row="0" data-fill="n">—</b>
+          <span>Waiting to pack / packing</span><b data-source="cot" data-field="p_pack" data-row="0" data-fill="n">—</b>
+          <span>Packed, waiting to ship</span><b data-source="cot" data-field="p_ship" data-row="0" data-fill="n">—</b>
+          <span class="h">When it was created</span>
+          <span>Day before, after 5 PM</span><b data-source="cot" data-field="pend_prev" data-row="0" data-fill="n">—</b>
+          <span>That day, before 5 PM</span><b data-source="cot" data-field="pend_tod" data-row="0" data-fill="n">—</b></div></div>
+      <div class="ob-tile live-only" id="t-need"><div class="ob-lbl">Needed per hour to close</div>
+        <div class="ob-big" id="need-big"><span data-source="projection" data-field="need" data-row="0" data-fill="n">—</span></div>
+        <div class="ob-note" id="need-today"><span data-source="projection" data-field="hrs_left" data-row="0" data-fill="d1">—</span> hrs left · pace <b><span data-source="projection" data-field="pace" data-row="0" data-fill="n">—</span>/hr</b><span id="need-gap"></span>.</div>
+        <div class="ob-note" id="need-past"></div></div>
+      <div class="ob-tile" id="t-miss"><div class="ob-lbl" id="miss-lbl">Projected to miss today</div>
+        <div class="ob-big" id="miss-today"><span data-source="projection" data-field="miss" data-row="0" data-fill="n">—</span></div>
+        <div class="ob-big c-bad" id="miss-past"><span data-source="cot" data-field="breaches" data-row="0" data-fill="n">—</span></div>
+        <div class="ob-note" id="miss-note"></div></div>
+      <div class="ob-tile live-only" id="t-breach"><div class="ob-lbl">Breached backlog (open, past deadline)</div>
+        <div class="ob-big c-bad"><span data-source="flow" data-field="breached_open" data-row="0" data-fill="n">—</span></div>
+        <div class="ob-note">Oldest overdue by <span data-source="flow" data-field="oldest_overdue_h" data-row="0" data-fill="d1">—</span> hrs. <span data-source="flow" data-field="at_risk_open" data-row="0" data-fill="n">—</span> more due within 3 hours.</div>
+        <div class="ob-bars" id="breach-bars">
+          <span>Due yesterday</span><i id="bb-1"></i><b data-source="flow" data-field="br_yday" data-row="0" data-fill="n">—</b>
+          <span>Due 2 days ago</span><i id="bb-2"></i><b data-source="flow" data-field="br_2d" data-row="0" data-fill="n">—</b>
+          <span>Due 3+ days ago</span><i id="bb-3"></i><b data-source="flow" data-field="br_3d" data-row="0" data-fill="n">—</b></div></div>
+    </div>
+  </section>
+
+  <section class="ob-card live-only" id="aging"><div id="aging-slot"></div></section>
+  <template id="tpl-aging">
+    <div class="ob-chead"><h2>Aging, live</h2>
+      </div>
+    <div class="agall">
+      <div class="ob-tile" id="ag-all" data-source="aging_all cycle"></div>
+      <div class="ob-tw" id="ag-steps-wrap">
+        <table id="ag-steps" data-source="aging_all" data-row-key="st">
+          <thead><tr><th>Where the order is now</th><th class="r" data-field="n">Orders</th><th class="r" data-field="b0">Under 2h</th><th class="r" data-field="b1">2–4h</th><th class="r" data-field="b2">4–8h</th><th class="r" data-field="b3">8–24h</th><th class="r" data-field="b4">1–2 days</th><th class="r" data-field="b5">2+ days</th><th class="r" data-field="med_m">Median age</th><th class="r" data-field="max_m">Oldest</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="ob-grid3">
+      <div class="ob-tile" id="ag-pick" data-source="aging cycle"></div>
+      <div class="ob-tile" id="ag-pack" data-source="aging cycle"></div>
+      <div class="ob-tile" id="ag-ship" data-source="aging cycle"></div>
+    </div>
+  </template>
+
+  <div class="ob-grid2">
+    <section class="ob-card" id="hourly">
+      <div class="ob-chead"><h2>Output per hour</h2>
+        <div class="ob-legend" id="hourly-legend"></div></div>
+      <div class="ob-chart dash-skeleton" id="hourly-chart" data-source="hourly"></div>
+    </section>
+    <section class="ob-card" id="pace">
+      <div class="ob-chead"><h2>Shipped vs target pace</h2>
+        <div class="ob-legend"><span><i id="pace-sw"></i>Cumulative shipped</span><span><i class="dash"></i>Even pace to cut-off orders</span></div></div>
+      <div class="ob-chart dash-skeleton" id="pace-chart" data-source="hourly cot"></div>
+    </section>
+  </div>
+
+  <section class="ob-card" id="productivity" data-source="people">
+    <div class="ob-chead"><h2>Productivity by hour</h2><span class="cap" id="prod-hint"></span></div>
+    <div class="ob-controls" style="margin-bottom:var(--cds-gap-md)">
+      <div class="seg" role="group" aria-label="View" id="view-sw"><button type="button" data-v="simple" aria-pressed="true">Simple</button><button type="button" data-v="detail" aria-pressed="false">Detailed</button></div>
+      <label class="ob-field">From hour <select id="f-hfrom"></select></label>
+      <label class="ob-field">To hour <select id="f-hto"></select></label>
+      <label class="ob-field">User <select id="f-user"><option value="">All users</option></select></label>
+      <label class="ob-field">Find user <input type="search" id="f-find" placeholder="Name contains"></label>
+    </div>
+    <div id="simple-view" class="ob-grid2">
+      <div class="ob-tile" id="sv-pick"></div>
+      <div class="ob-tile" id="sv-pack"></div>
+    </div>
+    <div id="detail-view" hidden>
+      <div class="role" id="role-pick" style="border-top:0;margin-top:0;padding-top:0"></div>
+      <div class="role" id="role-pack"></div>
+    </div>
+  </section>
+
+  <section class="ob-card live-only" id="sellers"><div id="sellers-slot"></div></section>
+  <template id="tpl-sellers">
+    <div class="ob-chead"><h2>Pending per seller</h2>
+      <div class="ob-controls">
+        <label class="ob-field">Find seller <input type="search" id="s-find" placeholder="Seller name"></label>
+        <label class="ob-field">Sort by <select id="s-sort">
+          <option value="pending">Pending orders</option><option value="breached">Breached</option>
+          <option value="wait_pick">Waiting to pick</option><option value="wait_pack">Waiting to pack</option><option value="wait_ship">Waiting to ship</option>
+          <option value="units">Units</option><option value="oldest_m">Oldest order</option><option value="med_m">Median age (oldest first)</option>
+          <option value="med_asc">Median age (newest first)</option><option value="over24">Orders over 24h</option></select></label>
+      </div></div>
+    <p class="cap" id="s-sum" hidden></p>
+    <div class="ob-legend" id="s-legend" style="margin-bottom:6px"></div>
+    <div class="ob-tw tall">
+      <table id="s-table" data-source="sellers" data-row-key="seller">
+        <thead><tr><th>Seller</th><th class="r" data-field="pending">Pending</th><th class="r" data-field="share_pct">Share</th><th class="r" data-field="wait_pick">Wait pick</th><th class="r" data-field="picking">Picking</th><th class="r" data-field="wait_pack">Wait pack</th><th class="r" data-field="packing">Packing</th><th class="r" data-field="wait_ship">Wait ship</th><th class="r" data-field="on_hold">On hold</th><th class="r" data-field="breached">Breached</th><th class="r" data-field="due_today">Due today</th><th class="r" data-field="created_today">New today</th><th class="r" data-field="units">Units</th><th class="r" data-field="oldest_m">Oldest</th><th class="r" data-field="newest_m">Newest</th><th class="r" data-field="med_m">Median age</th><th class="r" data-field="over24">Over 24h</th><th class="r" data-field="oldest_created">Oldest created</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </template>
+
+  <section class="ob-card" id="monthly"><div id="monthly-slot"></div></section>
+  <template id="tpl-monthly">
+    <div class="ob-chead"><h2 id="tr-title">Total per day</h2>
+      <div class="seg" role="group" aria-label="Period" id="tr-sw"><button type="button" data-g="day" aria-pressed="true">Daily</button><button type="button" data-g="week" aria-pressed="false">Weekly</button><button type="button" data-g="month" aria-pressed="false">Monthly</button></div></div>
+    <p id="tr-hint" hidden></p>
+    <div class="ob-chead" style="margin-bottom:4px"><span class="cap"><b>Shipping curve</b></span><div class="ob-legend"><span><i id="tr-sw-c"></i>Orders shipped</span><span><i class="dash"></i>Average</span><span><i style="background:transparent;border:2px solid var(--color-fg-muted);border-radius:50%"></i>Still in progress</span></div></div>
+    <div class="ob-chart dash-skeleton" id="tr-chart" data-source="totals" style="min-height:260px"></div>
+    <div class="ob-tw tall" style="margin-top:var(--cds-gap-md)">
+      <table id="m-table" data-source="totals" data-row-key="k">
+        <thead><tr><th id="m-col">Day</th><th class="r" data-field="due">Cut-off due</th><th class="r" data-field="on_time">Shipped on time</th><th class="r" data-field="cot_pct">COT %</th><th class="r" data-field="breaches">Breaches</th><th class="r" data-field="picked">Picked</th><th class="r" data-field="picked_i">Picked items</th><th class="r" data-field="pickers">Pickers</th><th class="r" data-field="packed">Packed</th><th class="r" data-field="packed_i">Packed items</th><th class="r" data-field="packers">Packers</th><th class="r" data-field="shipped">Shipped</th><th class="r" data-field="shipped_i">Shipped items</th><th class="r" data-field="ship_days">Shipping days</th><th class="r" data-field="shipped_per_day">Shipped / day</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </template>
+</div>
+
+<script>
+dash.loader('flow', { description: 'Metabase native-query answer turned into rows, numbers typed by column', fn: ({ answer }) => {
+  let p = answer; if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { throw new Error(p.slice(0, 300)); } }
+  if (p && p.status && p.status !== 'completed') throw new Error(String(p.error || ('Metabase query ' + p.status)));
+  const d = (p && p.data) || {}; const cols = d.cols || []; const rows = d.rows;
+  if (!Array.isArray(rows)) throw new Error(String((p && (p.error || p.message)) || 'Metabase returned no rows'));
+  const columns = cols.map((c) => c.name); const isNum = cols.map((c) => /Integer|Decimal|Float|Number/.test(c.base_type || ''));
+  const data = rows.map((r) => Object.fromEntries(columns.map((n, i) => [n, r[i] == null ? null : isNum[i] ? Number(r[i]) : r[i]])));
+  const sql = p && p.json_query && p.json_query.native && p.json_query.native.query;
+  return { data, columns, meta: sql ? [{ label: 'SQL that ran', value: sql, type: 'code', lang: 'sql' }] : [] };
+} });
+dash.loader('hourly', { description: 'Metabase native-query answer turned into rows, numbers typed by column', fn: ({ answer }) => {
+  let p = answer; if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { throw new Error(p.slice(0, 300)); } }
+  if (p && p.status && p.status !== 'completed') throw new Error(String(p.error || ('Metabase query ' + p.status)));
+  const d = (p && p.data) || {}; const cols = d.cols || []; const rows = d.rows;
+  if (!Array.isArray(rows)) throw new Error(String((p && (p.error || p.message)) || 'Metabase returned no rows'));
+  const columns = cols.map((c) => c.name); const isNum = cols.map((c) => /Integer|Decimal|Float|Number/.test(c.base_type || ''));
+  const data = rows.map((r) => Object.fromEntries(columns.map((n, i) => [n, r[i] == null ? null : isNum[i] ? Number(r[i]) : r[i]])));
+  const sql = p && p.json_query && p.json_query.native && p.json_query.native.query;
+  return { data, columns, meta: sql ? [{ label: 'SQL that ran', value: sql, type: 'code', lang: 'sql' }] : [] };
+} });
+dash.loader('people', { description: 'Metabase native-query answer turned into rows, numbers typed by column', fn: ({ answer }) => {
+  let p = answer; if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { throw new Error(p.slice(0, 300)); } }
+  if (p && p.status && p.status !== 'completed') throw new Error(String(p.error || ('Metabase query ' + p.status)));
+  const d = (p && p.data) || {}; const cols = d.cols || []; const rows = d.rows;
+  if (!Array.isArray(rows)) throw new Error(String((p && (p.error || p.message)) || 'Metabase returned no rows'));
+  const columns = cols.map((c) => c.name); const isNum = cols.map((c) => /Integer|Decimal|Float|Number/.test(c.base_type || ''));
+  const data = rows.map((r) => Object.fromEntries(columns.map((n, i) => [n, r[i] == null ? null : isNum[i] ? Number(r[i]) : r[i]])));
+  const sql = p && p.json_query && p.json_query.native && p.json_query.native.query;
+  return { data, columns, cut: rows.length >= 2000, meta: sql ? [{ label: 'SQL that ran', value: sql, type: 'code', lang: 'sql' }] : [] };
+} });
+dash.loader('aging_live', { description: 'Metabase native-query answer turned into rows, numbers typed by column', fn: ({ answer }) => {
+  let p = answer; if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { throw new Error(p.slice(0, 300)); } }
+  if (p && p.status && p.status !== 'completed') throw new Error(String(p.error || ('Metabase query ' + p.status)));
+  const d = (p && p.data) || {}; const cols = d.cols || []; const rows = d.rows;
+  if (!Array.isArray(rows)) throw new Error(String((p && (p.error || p.message)) || 'Metabase returned no rows'));
+  const columns = cols.map((c) => c.name); const isNum = cols.map((c) => /Integer|Decimal|Float|Number/.test(c.base_type || ''));
+  const data = rows.map((r) => Object.fromEntries(columns.map((n, i) => [n, r[i] == null ? null : isNum[i] ? Number(r[i]) : r[i]])));
+  const sql = p && p.json_query && p.json_query.native && p.json_query.native.query;
+  return { data, columns, meta: sql ? [{ label: 'SQL that ran', value: sql, type: 'code', lang: 'sql' }] : [] };
+} });
+dash.loader('cycle', { description: 'Metabase native-query answer turned into rows, numbers typed by column', fn: ({ answer }) => {
+  let p = answer; if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { throw new Error(p.slice(0, 300)); } }
+  if (p && p.status && p.status !== 'completed') throw new Error(String(p.error || ('Metabase query ' + p.status)));
+  const d = (p && p.data) || {}; const cols = d.cols || []; const rows = d.rows;
+  if (!Array.isArray(rows)) throw new Error(String((p && (p.error || p.message)) || 'Metabase returned no rows'));
+  const columns = cols.map((c) => c.name); const isNum = cols.map((c) => /Integer|Decimal|Float|Number/.test(c.base_type || ''));
+  const data = rows.map((r) => Object.fromEntries(columns.map((n, i) => [n, r[i] == null ? null : isNum[i] ? Number(r[i]) : r[i]])));
+  const sql = p && p.json_query && p.json_query.native && p.json_query.native.query;
+  return { data, columns, meta: sql ? [{ label: 'SQL that ran', value: sql, type: 'code', lang: 'sql' }] : [] };
+} });
+dash.loader('sellers', { description: 'Metabase native-query answer turned into rows, numbers typed by column', fn: ({ answer }) => {
+  let p = answer; if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { throw new Error(p.slice(0, 300)); } }
+  if (p && p.status && p.status !== 'completed') throw new Error(String(p.error || ('Metabase query ' + p.status)));
+  const d = (p && p.data) || {}; const cols = d.cols || []; const rows = d.rows;
+  if (!Array.isArray(rows)) throw new Error(String((p && (p.error || p.message)) || 'Metabase returned no rows'));
+  const columns = cols.map((c) => c.name); const isNum = cols.map((c) => /Integer|Decimal|Float|Number/.test(c.base_type || ''));
+  const data = rows.map((r) => Object.fromEntries(columns.map((n, i) => [n, r[i] == null ? null : isNum[i] ? Number(r[i]) : r[i]])));
+  const sql = p && p.json_query && p.json_query.native && p.json_query.native.query;
+  return { data, columns, cut: rows.length >= 2000, meta: sql ? [{ label: 'SQL that ran', value: sql, type: 'code', lang: 'sql' }] : [] };
+} });
+dash.loader('totals', { description: 'Metabase native-query answer turned into rows, numbers typed by column', fn: ({ answer }) => {
+  let p = answer; if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { throw new Error(p.slice(0, 300)); } }
+  if (p && p.status && p.status !== 'completed') throw new Error(String(p.error || ('Metabase query ' + p.status)));
+  const d = (p && p.data) || {}; const cols = d.cols || []; const rows = d.rows;
+  if (!Array.isArray(rows)) throw new Error(String((p && (p.error || p.message)) || 'Metabase returned no rows'));
+  const columns = cols.map((c) => c.name); const isNum = cols.map((c) => /Integer|Decimal|Float|Number/.test(c.base_type || ''));
+  const data = rows.map((r) => Object.fromEntries(columns.map((n, i) => [n, r[i] == null ? null : isNum[i] ? Number(r[i]) : r[i]])));
+  const sql = p && p.json_query && p.json_query.native && p.json_query.native.query;
+  return { data, columns, cut: rows.length >= 2000, meta: sql ? [{ label: 'SQL that ran', value: sql, type: 'code', lang: 'sql' }] : [] };
+} });
+
+
+dash.calc('cot', {
+  title: 'Cut-off orders for the day',
+  description: 'The cut-off (COT) columns of the order-flow query, for the chosen day.',
+  inputs: ['flow'],
+  fn: (flow) => flow.map((r) => ({ day: r.day, due: r.due, due_i: r.due_i, on_time: r.on_time, on_time_i: r.on_time_i, not_shipped: r.not_shipped, not_shipped_i: r.not_shipped_i, breaches: r.breaches, due_prev: r.due_prev, pend_prev: r.pend_prev, due_tod: r.due_tod, pend_tod: r.pend_tod, p_pick: r.p_pick, p_pack: r.p_pack, p_ship: r.p_ship, cot_pct: r.cot_pct })),
+});
+dash.calc('aging', {
+  title: 'Open-order age by step',
+  description: 'The pick, pack and ship rows of the live aging query.',
+  inputs: ['aging_live'],
+  fn: (aging_live) => aging_live.filter((r) => r.grp === 'step'),
+});
+dash.calc('aging_all', {
+  title: 'Open-order age since creation',
+  description: 'The by-status rows of the live aging query, with the all-orders total.',
+  inputs: ['aging_live'],
+  fn: (aging_live) => aging_live.filter((r) => r.grp === 'all').map((r) => ({ ...r, st: r.stage })),
+});
+dash.calc('ipp', {
+  title: 'Average IPP for the day',
+  description: 'Same as Productivity: units (and orders) divided by user-hours, where each person counts once for every hour they scanned on the chosen day.',
+  inputs: ['people'],
+  fn: (people) => {
+    const r = (role) => {
+      const rows = people.filter((x) => x.role === role);
+      const uh = rows.length;
+      const units = rows.reduce((a, x) => a + Number(x.units || 0), 0);
+      const orders = rows.reduce((a, x) => a + Number(x.n || 0), 0);
+      return { uh, ipp: uh ? Math.round(10 * units / uh) / 10 : null, opp: uh ? Math.round(10 * orders / uh) / 10 : null };
+    };
+    const pk = r('pick'), pa = r('pack');
+    return [{ pick_ipp: pk.ipp, pick_ipp_o: pk.opp, pick_uh: pk.uh, pack_ipp: pa.ipp, pack_ipp_o: pa.opp, pack_uh: pa.uh }];
+  },
+});
+dash.calc('projection', {
+  title: 'Midnight projection',
+  description: 'Today only: packing pace over the last full hour plus the current partial hour, hours left to midnight, and what that means for cut-off orders.',
+  inputs: ['flow', 'hourly'],
+  fn: (flow, hourly) => {
+    const f = flow[0] || {}, c = f;
+    const due = Number(c.due) || 0, on = Number(c.on_time) || 0, still = Number(c.not_shipped) || 0;
+    const upd = String(f.last_upd || '');
+    if (Number(f.is_today) !== 1 || !upd) return [{ is_today: 0, pace: null, hrs_left: null, need: null, gap: null, miss: null, proj_pct: null }];
+    const updH = Number(upd.slice(11, 13)), updM = Number(upd.slice(14, 16));
+    const packed = Array(24).fill(0);
+    hourly.forEach((r) => { if (r.s === 'packed') packed[Number(r.h)] = Number(r.n); });
+    const paceHrs = (updH >= 1 ? 1 : 0) + (updM + 1) / 60;
+    const pace = paceHrs > 0.25 ? ((updH >= 1 ? packed[updH - 1] : 0) + packed[updH]) / paceHrs : null;
+    const end = Date.parse(String(f.day).slice(0, 10) + 'T00:00:00Z') + 86400000;
+    const hrsLeft = Math.max((end - Date.parse(upd.slice(0, 19) + 'Z')) / 3600000, 0);
+    const need = hrsLeft > 0 ? still / hrsLeft : null;
+    const willShip = pace === null ? 0 : Math.min(still, pace * hrsLeft);
+    return [{
+      is_today: 1,
+      pace: pace === null ? null : Math.round(pace),
+      hrs_left: Math.round(hrsLeft * 10) / 10,
+      need: need === null ? null : Math.round(need),
+      gap: pace === null || need === null ? null : Math.round(pace - need),
+      miss: pace === null ? null : Math.max(0, Math.round(still - pace * hrsLeft)),
+      proj_pct: due ? Math.round(1000 * (on + willShip) / due) / 10 : null,
+    }];
+  },
+});
+
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const root = $('ob');
+  const PAL = () => { const cs = getComputedStyle(root); return ['--ob-c1', '--ob-c2', '--ob-c3', '--ob-c4'].map((v) => cs.getPropertyValue(v).trim() || '#34527D'); };
+  const n = (v) => Number(v || 0);
+  const fmtI = d3.format(',');
+  const fmt = (v) => (v === null || v === undefined || v === '' || isNaN(v)) ? '—' : fmtI(Math.round(Number(v)));
+  const fmt1 = (v) => (v === null || v === undefined || v === '' || !isFinite(v)) ? '—' : d3.format(',.1f')(Number(v));
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const hhmm = (s) => s ? String(s).slice(11, 16) : '—';
+  const naive = (s) => Date.parse(String(s).slice(0, 19) + 'Z');
+  const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const dmy = (s) => { if (!s) return '—'; const d = String(s); return d.slice(8, 10) + ' ' + MON[Number(d.slice(5, 7)) - 1] + ' ' + d.slice(11, 16); };
+  const dlong = (s) => { if (!s) return '—'; const d = String(s); return Number(d.slice(8, 10)) + ' ' + MON[Number(d.slice(5, 7)) - 1] + ' ' + d.slice(0, 4); };
+  const dur = (m) => { if (m === null || m === undefined || isNaN(m)) return '—'; m = Math.max(0, Math.round(Number(m))); const d = Math.floor(m / 1440), h = Math.floor((m % 1440) / 60), mi = m % 60; return d ? `${d}d ${h}h` : h ? `${h}h ${String(mi).padStart(2, '0')}m` : `${mi}m`; };
+  const H2 = (h) => String(h).padStart(2, '0') + ':00';
+  const get = (id) => { const d = dash.data(id); return d.status === 'ok' ? (Array.isArray(d.data) ? d.data : []) : null; };
+  const st = (id) => dash.data(id).status;
+  const failHTML = '<div class="ob-fail">Failed to load</div>';
+  const isErr = (s) => s === 'error' || s === 'connect' || s === 'declined' || s === 'missing';
+  const cairoToday = () => { try { const p = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Cairo', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date()); const g = (t) => p.find((x) => x.type === t).value; return g('year') + '-' + g('month') + '-' + g('day'); } catch (e) { return new Date().toISOString().slice(0, 10); } };
+
+  // ---------- tooltip ----------
+  function tipFor(box) {
+    let t = box.querySelector('.ob-tip');
+    if (!t) { t = document.createElement('div'); t.className = 'ob-tip'; t.hidden = true; box.appendChild(t); }
+    return {
+      show(ev, title, lines) {
+        t.replaceChildren();
+        const h = document.createElement('div'); h.className = 't'; h.textContent = title; t.appendChild(h);
+        lines.forEach(([col, label, val]) => { const l = document.createElement('div'); if (col) { const i = document.createElement('i'); i.style.background = col; l.appendChild(i); } l.appendChild(document.createTextNode(label + ': ' + val)); t.appendChild(l); });
+        t.hidden = false;
+        const r = box.getBoundingClientRect(); let x = ev.clientX - r.left + 12, y = ev.clientY - r.top - 10;
+        const w = t.offsetWidth; if (x + w > r.width) x = Math.max(0, ev.clientX - r.left - w - 12);
+        t.style.left = x + 'px'; t.style.top = Math.max(0, y) + 'px';
+      },
+      hide() { t.hidden = true; },
+    };
+  }
+
+  // ---------- params / controls ----------
+  const P = () => dash.params();
+  const num = (v, d) => { const x = Number(v); return isFinite(x) && x > 0 ? x : d; };
+  const targets = () => ({ pick: num(P().pick_target, 25), pack: num(P().pack_target, 30), shift: num(P().shift_hours, 8) });
+  const hourRange = () => { let a = Number(P().h_from ?? 0), b = Number(P().h_to ?? 23); if (!isFinite(a)) a = 0; if (!isFinite(b)) b = 23; return a > b ? [b, a] : [a, b]; };
+
+  const fDay = $('f-day');
+  fDay.max = cairoToday();
+  fDay.addEventListener('change', () => { if (fDay.value && fDay.validity.valid) dash.setParams({ day: fDay.value >= cairoToday() ? null : fDay.value }); });
+  fDay.addEventListener('blur', () => { fDay.value = P().day || cairoToday(); });
+  [['f-pick', 'pick_target'], ['f-pack', 'pack_target'], ['f-shift', 'shift_hours']].forEach(([id, k]) => {
+    const el = $(id);
+    el.addEventListener('change', () => { const v = Number(el.value); if (isFinite(v) && v > 0) dash.setParams({ [k]: v }); });
+  });
+  ['f-hfrom', 'f-hto'].forEach((id) => { const s = $(id); for (let h = 0; h < 24; h++) s.add(new Option(H2(h), h)); });
+  $('f-hfrom').addEventListener('change', () => dash.setParams({ h_from: Number($('f-hfrom').value) }));
+  $('f-hto').addEventListener('change', () => dash.setParams({ h_to: Number($('f-hto').value) }));
+  // Targets always open at the team standard (70 pick / 90 pack / 8 hrs); a viewer can still change them for this visit.
+  const setDefaults = () => dash.setParams({ pick_target: 70, pack_target: 90, shift_hours: 8 });
+  setDefaults();
+  $('f-reset').addEventListener('click', () => { dash.resetParams(); setDefaults(); });
+  $('f-refresh').addEventListener('click', () => {
+    const ids = ['flow', 'hourly', 'people', 'cycle'];
+    if ($('ag-steps')) ids.push('aging_live', 'sellers');
+    if ($('m-table')) ids.push('totals');
+    ids.forEach((id) => dash.refresh(id));
+  });
+
+  const local = { grain: 'day', tab: 'today', user: '', find: '', view: 'simple', sort: { pick: 'tot', pack: 'tot' }, showAll: { pick: false, pack: false }, sSort: 'pending', sFind: '' };
+  $('f-user').addEventListener('change', () => { local.user = $('f-user').value; drawProd(); });
+  $('f-find').addEventListener('input', () => { local.find = $('f-find').value.trim().toLowerCase(); drawProd(); });
+  root.querySelectorAll('#view-sw button').forEach((b) => b.addEventListener('click', () => {
+    local.view = b.dataset.v;
+    root.querySelectorAll('#view-sw button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    $('simple-view').hidden = local.view !== 'simple'; $('detail-view').hidden = local.view !== 'detail';
+    drawProd();
+  }));
+  root.addEventListener('input', (ev) => { if (ev.target.id === 's-find') { local.sFind = ev.target.value.trim().toLowerCase(); drawSellers(); } });
+  root.addEventListener('change', (ev) => { if (ev.target.id === 's-sort') { local.sSort = ev.target.value; drawSellers(); } });
+  const mountLive = () => ['aging', 'sellers'].forEach((id) => { const slot = $(id + '-slot'); if (!slot.childElementCount) slot.appendChild($('tpl-' + id).content.cloneNode(true)); });
+
+  const cairoYesterday = () => new Date(Date.parse(cairoToday() + 'T00:00:00Z') - 86400000).toISOString().slice(0, 10);
+  const viewOf = (p) => (!p.day || p.day >= cairoToday() ? 'today' : 'past');
+  const mountMonthly = () => { const slot = $('monthly-slot'); if (!slot.childElementCount) slot.appendChild($('tpl-monthly').content.cloneNode(true)); };
+  const openTab = (v) => {
+    local.tab = v; dash.setLink(v);
+    if (v === 'monthly') { mountMonthly(); drawAll(); return; }
+    dash.setParams({ day: v === 'yesterday' ? cairoYesterday() : null });
+  };
+  root.querySelectorAll('#tabs button').forEach((b) => b.addEventListener('click', () => openTab(b.dataset.v)));
+  if (location.hash === '#yesterday' && !P().day) dash.setParams({ day: cairoYesterday() });
+  if (location.hash === '#monthly') { local.tab = 'monthly'; mountMonthly(); }
+  fDay.max = cairoYesterday();
+  function syncControls() {
+    const p = P(), t = targets(), [a, b] = hourRange();
+    const view = local.tab === 'monthly' ? 'monthly' : viewOf(p); root.dataset.view = view;
+    if (view === 'today') mountLive();
+    root.querySelectorAll('#tabs button').forEach((x) => x.setAttribute('aria-selected', String(x.dataset.v === (view === 'past' ? 'yesterday' : view))));
+    $('tab-yesterday').textContent = view === 'past' && p.day !== cairoYesterday() ? 'Past day' : 'Yesterday';
+    if (fDay !== document.activeElement) fDay.value = p.day || cairoToday();
+    [['f-pick', t.pick], ['f-pack', t.pack], ['f-shift', t.shift]].forEach(([id, v]) => { if ($(id) !== document.activeElement) $(id).value = v; });
+    $('f-hfrom').value = String(a); $('f-hto').value = String(b);
+  }
+
+  // ---------- marked single values ----------
+  function fillMarks() {
+    root.querySelectorAll('[data-fill]').forEach((el) => {
+      const d = dash.data(el.dataset.source);
+      if (d.status !== 'ok') { el.textContent = '—'; el.classList.toggle('dash-skeleton', d.status === 'loading'); return; }
+      el.classList.remove('dash-skeleton');
+      const row = (d.data || [])[Number(el.dataset.row || 0)];
+      const v = row ? row[el.dataset.field] : null;
+      const k = el.dataset.fill;
+      el.textContent = v === null || v === undefined ? '—' : k === 'pct' ? fmt1(v) + '%' : k === 'd1' ? fmt1(v) : k === 'time' ? hhmm(v) : fmt(v);
+    });
+  }
+
+  // ---------- header, freshness, flow, cut-off ----------
+  function drawTop() {
+    const flow = get('flow'), cot = get('cot'), proj = get('projection');
+    const f = flow && flow[0], c = cot && cot[0], pr = proj && proj[0];
+    const today = f ? Number(f.is_today) === 1 : !P().day;
+    $('tk-day').textContent = today ? 'Today' : 'On ' + dlong(f ? f.day : P().day);
+    $('tk-proj').hidden = !today;
+
+    // freshness
+    const fr = $('fresh');
+    if (f) {
+      const lag = (naive(f.now_c) - naive(f.last_upd)) / 60000;
+      const cls = lag <= 70 ? 'ok' : lag <= 180 ? 'warn' : 'bad';
+      fr.className = 'ob-fresh ' + cls;
+      $('fresh-head').textContent = cls === 'ok' ? 'Data is current.' : cls === 'warn' ? 'Data is delayed.' : 'Data is not updating — ask the data team to check the Omniful sync.';
+      $('fresh-lag').textContent = ' (' + (lag < 60 ? Math.round(lag) + ' min behind' : fmt1(lag / 60) + ' hrs behind') + ')';
+    } else { fr.className = 'ob-fresh' + (isErr(st('flow')) ? ' bad' : ''); $('fresh-head').textContent = isErr(st('flow')) ? 'Couldn’t reach Metabase.' : 'Checking data…'; $('fresh-lag').textContent = ''; }
+
+    // flow highlight
+    root.querySelectorAll('.ob-stage').forEach((s) => s.classList.remove('hot'));
+    if (f) {
+      const q = ['wait_pick', 'wait_pack', 'wait_ship'].map((k) => [k, n(f[k])]).reduce((a, b) => (b[1] > a[1] ? b : a));
+      if (q[1] > 0) root.querySelector(`.ob-stage[data-q="${q[0]}"]`).classList.add('hot');
+    }
+    $('shipped-lbl').textContent = today ? 'Shipped today' : 'Shipped that day';
+    $('shipped-note').textContent = '';
+
+    // cut-off tiles
+    const colr = (v) => v >= 95 ? 'var(--color-ok)' : v >= 80 ? 'var(--color-warn)' : 'var(--color-bad)';
+    const clsr = (v) => v >= 95 ? 'c-ok' : v >= 80 ? 'c-warn' : 'c-bad';
+    const pct = c ? n(c.cot_pct) : null;
+    const judge = today && pr && pr.proj_pct !== null ? pr.proj_pct : pct;
+    $('cot-lbl').textContent = today ? 'Shipped so far (COT %, final at midnight)' : 'Shipped on time (COT %)';
+    $('cot-big').className = 'ob-big ' + (judge === null ? '' : clsr(judge));
+    $('cot-bar').style.width = (pct || 0) + '%';
+    $('cot-bar').style.background = judge === null ? 'var(--cds-chart-muted)' : colr(judge);
+    $('cot-today').hidden = !today; $('cot-past').hidden = today;
+    $('pend-lbl').textContent = today ? 'Pendency now (not shipped)' : 'Not shipped that day';
+    $('need-today').hidden = !today; $('need-past').hidden = today;
+    const gap = pr ? pr.gap : null;
+    $('need-big').className = 'ob-big ' + (!today || gap === null ? '' : gap >= 0 ? 'c-ok' : gap >= -0.2 * n(pr.need) ? 'c-warn' : 'c-bad');
+    $('need-gap').textContent = !today || gap === null ? '' : gap < 0 ? `, ${fmt(-gap)}/hr short` : ', on pace';
+    $('need-gap').className = gap !== null && gap < 0 ? 'c-bad' : 'c-ok';
+    $('miss-today').hidden = !today; $('miss-past').hidden = today;
+    $('miss-lbl').textContent = today ? 'Projected to miss today' : 'Breaches that day';
+    $('miss-today').className = 'ob-big ' + (pr && pr.miss !== null ? (pr.miss === 0 ? 'c-ok' : 'c-bad') : '');
+    $('miss-note').textContent = '';
+    const bmax = Math.max(1, ...(f ? [f.br_yday, f.br_2d, f.br_3d].map(n) : [1]));
+    [['bb-1', 'br_yday', 0.55], ['bb-2', 'br_2d', 0.78], ['bb-3', 'br_3d', 1]].forEach(([id, k, o]) => { const el = $(id); el.style.width = f ? Math.max(2, 100 * n(f[k]) / bmax) + '%' : '0'; el.style.opacity = o; });
+  }
+
+  // ---------- aging ----------
+  const AG_B = [['Under 1h', 'var(--color-ok)'], ['1–2h', 'color-mix(in srgb,var(--color-ok) 55%,var(--color-warn))'], ['2–4h', 'var(--color-warn)'], ['4–8h', 'color-mix(in srgb,var(--color-warn) 50%,var(--color-bad))'], ['8–24h', 'var(--color-bad)'], ['24h+', 'color-mix(in srgb,var(--color-bad) 70%,var(--color-fg))']];
+  const AGA_B = [['Under 2h', 'var(--color-ok)'], ['2–4h', 'color-mix(in srgb,var(--color-ok) 50%,var(--color-warn))'], ['4–8h', 'var(--color-warn)'], ['8–24h', 'color-mix(in srgb,var(--color-warn) 45%,var(--color-bad))'], ['1–2 days', 'var(--color-bad)'], ['2+ days', 'color-mix(in srgb,var(--color-bad) 65%,var(--color-fg))']];
+  const STEP = { '1': 'Waiting to pick', '2': 'Picking now', '3': 'Waiting to pack', '4': 'Packing now', '5': 'Waiting to ship', '6': 'On hold' };
+  function drawAging() {
+    if (!$('ag-steps')) return;
+    const aa = get('aging_all'), ag = get('aging'), cy = get('cycle');
+    const flow = get('flow'); const today = flow && flow[0] ? Number(flow[0].is_today) === 1 : !P().day;
+    const dayTxt = today ? 'today' : 'on ' + dlong(flow && flow[0] ? flow[0].day : P().day);
+    const tb = $('ag-steps').querySelector('tbody');
+    if (!aa) {
+      $('ag-all').innerHTML = isErr(st('aging_all')) ? failHTML : '<div class="dash-skeleton" style="min-height:160px"></div>';
+      tb.replaceChildren();
+    } else {
+      const all = aa.find((r) => r.st === 'all') || { n: 0 };
+      const nn = n(all.n), b = [all.b0, all.b1, all.b2, all.b3, all.b4, all.b5].map(n);
+      const c = cy && cy.find((r) => r.stage === 'total');
+      const k = !nn ? 'ok' : (b[4] + b[5]) / nn >= 0.1 ? 'bad' : (b[3] + b[4] + b[5]) / nn >= 0.4 ? 'warn' : 'ok';
+      $('ag-all').innerHTML = `<h3>Overall aging</h3>
+        <div class="ob-big c-${k}">${fmt(nn)} <span class="cap">open orders · ${fmt(all.units)} units</span></div>
+        <div class="stats"><div><small>Average age</small><strong>${dur(all.avg_m)}</strong></div><div><small>Median age</small><strong>${dur(all.med_m)}</strong></div><div><small>Oldest</small><strong class="${n(all.max_m) >= 2880 ? 'c-bad' : ''}">${dur(all.max_m)}</strong></div></div>
+        <div class="agbar" role="img" aria-label="All open orders by age">${nn ? b.map((v, i) => v ? `<i style="width:${100 * v / nn}%;background:${AGA_B[i][1]}"></i>` : '').join('') : ''}</div>
+        <div class="done">${c && n(c.n) ? `<b>Created → shipped</b>, shipped ${esc(dayTxt)}: ${fmt(c.n)} orders. Median <b>${dur(c.med_m)}</b>, average <b>${dur(c.avg_m)}</b>.` : `<b>Created → shipped</b>: no orders shipped ${esc(dayTxt)} yet.`}</div>`;
+      const rows = ['1', '2', '3', '4', '5', '6'].map((s) => aa.find((r) => r.st === s)).filter(Boolean);
+      tb.replaceChildren(...rows.concat([all]).map((r) => {
+        const tr = document.createElement('tr'); tr.dataset.key = r.st;
+        const cells = [r.st === 'all' ? 'All open orders' : STEP[r.st], fmt(r.n), ...[r.b0, r.b1, r.b2, r.b3, r.b4, r.b5].map(fmt), dur(r.med_m), dur(r.max_m)];
+        cells.forEach((v, i) => { const td = document.createElement('td'); td.textContent = v; if (i) td.className = 'r'; if (i >= 2 && i <= 7 && n([r.b0, r.b1, r.b2, r.b3, r.b4, r.b5][i - 2])) td.style.color = AGA_B[i - 2][1]; if (r.st === 'all') td.style.fontWeight = '500'; tr.appendChild(td); });
+        return tr;
+      }));
+    }
+    const meta = { pick: ['Creation → pick', 'Waiting to pick or being picked. Age = time since the order was created', 'Created → picked', 'picked'], pack: ['Pick → pack', 'Picked, waiting to pack or being packed. Age = time since it was picked', 'Picked → packed', 'packed'], ship: ['Pack → ship', 'Packed, waiting to ship. Age = time since it was packed', 'Packed → shipped', 'shipped'] };
+    ['pick', 'pack', 'ship'].forEach((s) => {
+      const box = $('ag-' + s);
+      if (!ag) { box.innerHTML = isErr(st('aging')) ? failHTML : '<div class="dash-skeleton" style="min-height:160px"></div>'; return; }
+      const a = ag.find((r) => r.stage === s) || { n: 0 };
+      const c = cy && cy.find((r) => r.stage === s);
+      const nn = n(a.n), b = [a.b0, a.b1, a.b2, a.b3, a.b4, a.b5].map(n), over4 = b[3] + b[4] + b[5];
+      const k = !nn ? 'ok' : over4 / nn >= 0.3 ? 'bad' : (b[2] + over4) / nn >= 0.3 ? 'warn' : 'ok';
+      box.innerHTML = `<h3>${meta[s][0]}</h3>
+        <div class="ob-big c-${k}">${fmt(nn)} <span class="cap">open now · ${fmt(a.units)} units</span></div>
+        <div class="cap">${s === 'ship' ? 'All are packed or ready to ship' : `${fmt(nn - n(a.n_doing))} waiting + ${fmt(a.n_doing)} being ${s === 'pick' ? 'picked' : 'packed'} now`}</div>
+        <div class="stats"><div><small>Average age</small><strong>${dur(a.avg_m)}</strong></div><div><small>Median age</small><strong>${dur(a.med_m)}</strong></div><div><small>Oldest</small><strong class="${n(a.max_m) >= 1440 ? 'c-bad' : ''}">${dur(a.max_m)}</strong></div></div>
+        <div class="agbar" role="img" aria-label="Open orders by age">${nn ? b.map((v, i) => v ? `<i style="width:${100 * v / nn}%;background:${AG_B[i][1]}"></i>` : '').join('') : ''}</div>
+        <div class="agrows">${b.map((v, i) => `<div><small>${AG_B[i][0]}</small><b style="color:${v ? AG_B[i][1] : 'var(--color-fg-muted)'}">${fmt(v)}</b></div>`).join('')}</div>
+        <div class="done">${c && n(c.n) ? `<b>${meta[s][2]}</b> ${esc(dayTxt)}: ${fmt(c.n)} orders. Median <b>${dur(c.med_m)}</b>, average <b>${dur(c.avg_m)}</b>.` : `<b>${meta[s][2]}</b>: none ${esc(dayTxt)} yet.`}</div>`;
+    });
+  }
+
+  // ---------- charts ----------
+  function axisStyle(g) { g.attr('font-size', null).attr('font-family', null); g.selectAll('.domain').attr('stroke', 'var(--cds-chart-axis)'); g.selectAll('.tick line').attr('stroke', 'var(--cds-chart-grid)'); }
+  function chartState(box, id) {
+    const s = st(id);
+    if (s === 'ok') { box.classList.remove('dash-skeleton'); return true; }
+    box.replaceChildren(); box.classList.toggle('dash-skeleton', s === 'loading');
+    if (isErr(s)) box.innerHTML = failHTML;
+    return false;
+  }
+  const SER = () => [['picked', 'Picked', PAL()[1]], ['packed', 'Packed', PAL()[3]], ['shipped', 'Shipped', PAL()[0]]];
+  function drawHourly() {
+    const box = $('hourly-chart');
+    $('hourly-legend').innerHTML = SER().map(([, l, c]) => `<span><i style="background:${c}"></i>${l}</span>`).join('');
+    if (!chartState(box, 'hourly')) return;
+    const rows = get('hourly');
+    const g = { picked: Array(24).fill(0), packed: Array(24).fill(0), shipped: Array(24).fill(0) };
+    rows.forEach((r) => { if (g[r.s]) g[r.s][n(r.h)] = n(r.n); });
+    const W = Math.max(280, box.clientWidth), Ht = 240, M = { t: 10, r: 6, b: 24, l: 8 };
+    const max = Math.max(10, ...g.picked, ...g.packed, ...g.shipped);
+    const y = d3.scaleLinear([0, max], [Ht - M.b, M.t]).nice();
+    box.replaceChildren();
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${Ht}`).attr('role', 'img').attr('aria-label', 'Orders picked, packed and shipped per hour');
+    const ya = svg.append('g'); ya.call(d3.axisLeft(y).ticks(4).tickFormat(d3.format(','))); axisStyle(ya);
+    let lw = 0; ya.selectAll('text').each(function () { lw = Math.max(lw, this.getComputedTextLength()); });
+    M.l = lw + 12; ya.attr('transform', `translate(${M.l},0)`); ya.select('.domain').remove();
+    ya.selectAll('.tick line').attr('x2', W - M.l - M.r);
+    const x = d3.scaleBand(d3.range(24), [M.l, W - M.r]).paddingInner(0.2).paddingOuter(0.1);
+    const xs = d3.scaleBand(['picked', 'packed', 'shipped'], [0, x.bandwidth()]).padding(0.08);
+    const step = W < 520 ? 4 : 2;
+    const xa = svg.append('g').attr('transform', `translate(0,${Ht - M.b})`).call(d3.axisBottom(x).tickValues(d3.range(0, 24, step)).tickFormat((h) => String(h).padStart(2, '0')).tickSize(0).tickPadding(8)); axisStyle(xa);
+    const tip = tipFor(box);
+    const hrs = svg.append('g').selectAll('g').data(d3.range(24)).join('g').attr('transform', (h) => `translate(${x(h)},0)`);
+    SER().forEach(([k, , col]) => {
+      hrs.filter((h) => g[k][h] > 0).append('rect').attr('x', xs(k)).attr('width', xs.bandwidth()).attr('y', (h) => y(g[k][h])).attr('height', (h) => y(0) - y(g[k][h])).attr('rx', Math.min(3, xs.bandwidth() / 2)).attr('fill', col);
+    });
+    hrs.append('rect').attr('width', x.bandwidth()).attr('y', M.t).attr('height', Ht - M.b - M.t).attr('fill', 'transparent')
+      .on('mousemove', (ev, h) => tip.show(ev, H2(h), SER().map(([k, l, c]) => [c, l, fmt(g[k][h])])))
+      .on('mouseleave', () => tip.hide());
+  }
+  function drawPace() {
+    const box = $('pace-chart');
+    $('pace-sw').style.background = PAL()[0];
+    if (!chartState(box, 'hourly')) return;
+    if (st('cot') !== 'ok') { chartState(box, 'cot'); return; }
+    const rows = get('hourly'), c = (get('cot') || [])[0] || {}, f = (get('flow') || [])[0];
+    const due = n(c.due);
+    const sh = Array(24).fill(0); rows.forEach((r) => { if (r.s === 'shipped') sh[n(r.h)] = n(r.n); });
+    const cum = []; sh.reduce((a, v, i) => (cum[i] = a + v), 0);
+    const target = d3.range(24).map((h) => due * (h + 1) / 24);
+    const last = f && Number(f.is_today) === 1 ? Math.max(0, Math.min(23, Number(String(f.last_upd).slice(11, 13)))) : 23;
+    const W = Math.max(280, box.clientWidth), Ht = 240, M = { t: 14, r: 12, b: 24, l: 8 };
+    const y = d3.scaleLinear([0, Math.max(10, due, cum[23] || 0)], [Ht - M.b, M.t]).nice();
+    box.replaceChildren();
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${Ht}`).attr('role', 'img').attr('aria-label', 'Cumulative shipped against an even pace');
+    const ya = svg.append('g'); ya.call(d3.axisLeft(y).ticks(4).tickFormat(d3.format(','))); axisStyle(ya);
+    let lw = 0; ya.selectAll('text').each(function () { lw = Math.max(lw, this.getComputedTextLength()); });
+    M.l = lw + 12; ya.attr('transform', `translate(${M.l},0)`); ya.select('.domain').remove(); ya.selectAll('.tick line').attr('x2', W - M.l - M.r);
+    const x = d3.scaleLinear([0, 23], [M.l + 4, W - M.r]);
+    const step = W < 520 ? 4 : 2;
+    const xa = svg.append('g').attr('transform', `translate(0,${Ht - M.b})`).call(d3.axisBottom(x).tickValues(d3.range(0, 24, step)).tickFormat((h) => String(h).padStart(2, '0')).tickSize(0).tickPadding(8)); axisStyle(xa);
+    const line = d3.line().x((d, i) => x(i)).y((d) => y(d));
+    svg.append('path').attr('d', line(target)).attr('fill', 'none').attr('stroke', 'var(--cds-chart-reference)').attr('stroke-width', 1.5).attr('stroke-dasharray', '5 4');
+    svg.append('path').attr('d', line(cum.slice(0, last + 1))).attr('fill', 'none').attr('stroke', PAL()[0]).attr('stroke-width', 2).attr('stroke-linejoin', 'round').attr('stroke-linecap', 'round');
+    const lv = cum[last] || 0, gap = lv - target[last];
+    svg.append('circle').attr('cx', x(last)).attr('cy', y(lv)).attr('r', 4).attr('fill', PAL()[0]);
+    const lab = svg.append('text').attr('y', Math.max(y(lv) - 10, 12)).style('font-weight', 600).style('fill', gap >= 0 ? 'var(--color-ok)' : 'var(--color-bad)').text(`${gap >= 0 ? '+' : '−'}${fmt(Math.abs(gap))} vs pace`);
+    const tw = lab.node().getComputedTextLength(); lab.attr('x', Math.min(x(last) + 8, W - M.r - tw));
+    const tip = tipFor(box);
+    const dot = svg.append('circle').attr('r', 4).attr('fill', PAL()[0]).attr('opacity', 0);
+    svg.append('rect').attr('x', M.l).attr('y', M.t).attr('width', W - M.l - M.r).attr('height', Ht - M.t - M.b).attr('fill', 'transparent')
+      .on('mousemove', (ev) => { const [mx] = d3.pointer(ev); const h = Math.max(0, Math.min(last, Math.round(x.invert(mx)))); dot.attr('cx', x(h)).attr('cy', y(cum[h])).attr('opacity', 1); tip.show(ev, H2(h) + ' – ' + String(h).padStart(2, '0') + ':59', [[PAL()[0], 'Shipped so far', fmt(cum[h])], [null, 'Even pace', fmt(target[h])]]); })
+      .on('mouseleave', () => { dot.attr('opacity', 0); tip.hide(); });
+  }
+
+  // ---------- productivity ----------
+  function roleData(role) {
+    const t = targets(), tgt = role === 'pick' ? t.pick : t.pack, [hf, ht] = hourRange();
+    const hours = d3.range(hf, ht + 1), dailyT = tgt * Math.min(t.shift, ht - hf + 1);
+    const map = new Map();
+    (get('people') || []).filter((r) => r.role === role).forEach((r) => {
+      let p = map.get(r.emp); if (!p) { p = { emp: r.emp, hours: Array(24).fill(0), units: Array(24).fill(0), last: '' }; map.set(r.emp, p); }
+      p.hours[n(r.h)] += n(r.n); p.units[n(r.h)] += n(r.units); if (String(r.last_scan) > p.last) p.last = String(r.last_scan);
+    });
+    let people = [...map.values()];
+    if (local.user) people = people.filter((p) => p.emp === local.user);
+    if (local.find) people = people.filter((p) => String(p.emp).toLowerCase().includes(local.find));
+    people = people.map((p) => {
+      const tot = d3.sum(hours, (h) => p.hours[h]), u = d3.sum(hours, (h) => p.units[h]), active = hours.filter((h) => p.hours[h] > 0).length;
+      return { ...p, tot, u, active, rate: active ? tot / active : 0, urate: active ? u / active : 0, ach: 100 * u / dailyT, hitHrs: hours.filter((h) => p.units[h] >= tgt).length };
+    }).filter((p) => p.tot > 0);
+    const hr = hours.map((h) => { const act = people.filter((p) => p.hours[h] > 0); return { h, users: act.length, hit: act.filter((p) => p.units[h] >= tgt).length, orders: d3.sum(act, (p) => p.hours[h]), units: d3.sum(act, (p) => p.units[h]), cap: act.length * tgt }; });
+    return { tgt, shift: t.shift, dailyT, hf, ht, hours, people, hr };
+  }
+  const cls = (pct) => pct >= 100 ? 'ok' : pct >= 80 ? 'warn' : 'bad';
+
+  function drawSimple(role) {
+    const box = $('sv-' + role), title = role === 'pick' ? 'Picking' : 'Packing';
+    const D = roleData(role), hrs = D.hr.filter((r) => r.users > 0);
+    if (!hrs.length) { box.innerHTML = `<h3>${title}</h3><div class="ob-empty" style="margin-top:8px">No ${title.toLowerCase()} scans for this filter.</div>`; return; }
+    const f = (get('flow') || [])[0]; const upd = f ? String(f.last_upd) : '', nowC = f ? String(f.now_c) : '';
+    const today = f && Number(f.is_today) === 1;
+    const updH = upd ? Number(upd.slice(11, 13)) : null, nowH = nowC ? Number(nowC.slice(11, 13)) : null;
+    const pending = []; if (today && updH !== null && nowH !== null) for (let h = updH + 1; h <= nowH; h++) if (h >= D.hf && h <= D.ht) pending.push(h);
+    const tot = d3.sum(hrs, (r) => r.orders), units = d3.sum(hrs, (r) => r.units), slots = d3.sum(hrs, (r) => r.users), hit = d3.sum(hrs, (r) => r.hit);
+    const maxU = Math.max(1, ...hrs.map((r) => r.units));
+    box.innerHTML = `<div class="ob-chead" style="margin-bottom:6px"><h3>${title}</h3><span class="cap">Target ${fmt(D.tgt)} units per user per hour</span></div>
+      <div class="ob-tw"><table><thead><tr><th>Hour</th><th class="r">Users</th><th class="r">Orders</th><th class="r">Units</th><th></th><th class="r">Units / user</th><th class="r">Hit target</th></tr></thead>
+      <tbody>${hrs.map((r) => `<tr><td><b>${H2(r.h)}</b>${today && r.h === updH && upd.slice(14, 16) !== '59' ? ` <span class="c-warn cap">to ${esc(upd.slice(11, 16))}</span>` : ''}</td><td class="r">${fmt(r.users)}</td><td class="r"><b>${fmt(r.orders)}</b></td><td class="r"><b>${fmt(r.units)}</b></td><td style="width:22%;min-width:60px"><span class="ubar" style="width:${100 * r.units / maxU}%;background:${role === 'pick' ? PAL()[0] : PAL()[1]}"></span></td><td class="r c-${cls(100 * (r.users ? r.units / r.users : 0) / D.tgt)}">${fmt1(r.users ? r.units / r.users : null)}</td><td class="r">${fmt(r.hit)} <span class="muted">of ${fmt(r.users)}</span></td></tr>`).join('')}${pending.map((h) => `<tr class="pend"><td><b>${H2(h)}</b></td><td colspan="6">Not in Metabase yet — arrives with the next sync.</td></tr>`).join('')}</tbody>
+      <tfoot><tr><td>Total</td><td class="r">${fmt(D.people.length)}</td><td class="r">${fmt(tot)}</td><td class="r">${fmt(units)}</td><td></td><td class="r">${fmt1(slots ? units / slots : null)}</td><td class="r">${fmt(hit)} <span class="muted">of ${fmt(slots)}</span></td></tr></tfoot></table></div>
+`;
+  }
+
+  function drawRole(role) {
+    const box = $('role-' + role), word = role === 'pick' ? 'picked' : 'packed', person = role === 'pick' ? 'Picker' : 'Packer', title = role === 'pick' ? 'Picking' : 'Packing';
+    const D = roleData(role); let { hours, people, hr } = D; const tgt = D.tgt;
+    if (!people.length) { box.innerHTML = `<h3>${title}</h3><div class="ob-empty" style="margin-top:8px">No ${title.toLowerCase()} scans for this filter.</div>`; return; }
+    const act = hours.filter((h) => people.some((p) => p.hours[h] > 0)); if (act.length) { const a = act[0], z = act[act.length - 1]; hours = hours.filter((h) => h >= a && h <= z); hr = hr.filter((r) => r.h >= a && r.h <= z); }
+    const tot = d3.sum(people, (p) => p.tot), units = d3.sum(people, (p) => p.u), uh = d3.sum(people, (p) => p.active);
+    const rate = uh ? tot / uh : 0, ratePct = 100 * rate / tgt;
+    const worked = hr.filter((r) => r.users > 0), peak = worked.reduce((a, r) => (r.users > a.users ? r : a), { users: 0, h: 0 }), best = worked.reduce((a, r) => (r.orders > a.orders ? r : a), { orders: 0, h: 0 });
+    const onT = people.filter((p) => p.rate >= tgt).length;
+    const sortKey = local.sort[role];
+    const sorted = [...people].sort((a, b) => sortKey === 'rate' ? b.rate - a.rate : sortKey === 'ach' ? b.ach - a.ach : sortKey === 'low' ? a.rate - b.rate : b.tot - a.tot);
+    const lim = local.showAll[role] ? sorted.length : 15;
+    const eligible = people.filter((p) => p.active >= 2), low = eligible.filter((p) => p.rate < 0.8 * tgt).sort((a, b) => a.rate - b.rate), top3 = [...eligible].sort((a, b) => b.rate - a.rate).slice(0, 3);
+    const heat = (v) => { if (!v) return 'color-mix(in srgb,var(--color-fg) 8%,transparent)'; const r = v / tgt; const c = r >= 1 ? 'var(--color-ok)' : r >= 0.8 ? 'var(--color-warn)' : 'var(--color-bad)'; return `color-mix(in srgb, ${c} ${Math.round(40 + 50 * Math.min(r, 1))}%, transparent)`; };
+    const li = (p, k) => `<li><span>${esc(p.emp)}</span><b class="${k}">${fmt1(p.rate)}/hr</b></li>`;
+    box.innerHTML = `<div class="ob-chead"><h3>${title}</h3><label class="ob-field" style="flex-direction:row;align-items:center;gap:6px">Rank by <select class="rk">
+        <option value="tot">Orders</option><option value="rate">Orders per hour</option><option value="ach">Achieved %</option><option value="low">Lowest per hour first</option></select></label></div>
+      <div class="kpis">
+        <div class="kpi"><div class="cap">Orders ${word}</div><div class="v">${fmt(tot)}</div><div class="cap">${fmt(units)} items</div></div>
+        <div class="kpi"><div class="cap">Users worked</div><div class="v">${fmt(people.length)}</div><div class="cap">Avg ${fmt1(worked.length ? uh / worked.length : null)}/hr, peak ${fmt(peak.users)} at ${H2(peak.h)}</div></div>
+        <div class="kpi"><div class="cap">Orders per user</div><div class="v">${fmt1(tot / people.length)}</div></div>
+        <div class="kpi"><div class="cap">Rate per user-hour</div><div class="v c-${cls(ratePct)}">${fmt1(rate)}</div><div class="cap">${fmt(ratePct)}% of target ${fmt(tgt)}/hr</div></div>
+        <div class="kpi"><div class="cap">On target</div><div class="v">${fmt(onT)} <span class="cap">/ ${fmt(people.length)}</span></div><div class="cap">Busiest ${H2(best.h)}, ${fmt(best.orders)} orders</div></div>
+      </div>
+      <div class="rolegrid">
+        <div><div class="ob-chead" style="margin-bottom:4px"><span class="cap">Orders vs capacity</span>
+          <span class="ob-legend"><span><i style="background:var(--color-ok)"></i>At capacity</span><span><i style="background:var(--color-warn)"></i>80–99%</span><span><i style="background:var(--color-bad)"></i>Under 80%</span><span><i class="dash"></i>Capacity</span></span></div>
+          <div class="ob-chart cap-chart" id="cap-${role}" style="min-height:220px"></div></div>
+        <div class="attn ob-tile"><h3 style="margin-bottom:6px">Needs attention</h3>
+          ${low.length ? `<ul>${low.slice(0, 6).map((p) => li(p, 'c-bad')).join('')}</ul>${low.length > 6 ? `<p class="cap">and ${low.length - 6} more</p>` : ''}` : '<p class="cap">None</p>'}
+          <h3 style="margin:6px 0">Fastest ${person.toLowerCase()}s</h3>${top3.length ? `<ul>${top3.map((p) => li(p, 'c-ok')).join('')}</ul>` : '<p class="cap">—</p>'}</div>
+      </div>
+      <div class="ob-chead" style="margin:var(--cds-gap-md) 0 4px"><span class="cap"><b>${person} leaderboard</b></span><span class="cap">Daily target ${fmt(D.dailyT)} units = ${fmt(tgt)}/hr × ${fmt1(D.dailyT / tgt)} hrs</span></div>
+      <div class="ob-tw tall"><table><thead><tr><th class="r">#</th><th>${person}</th><th>Progress to daily target</th><th class="r">Orders</th><th class="r">Items</th><th class="r">Orders / hr</th><th class="r">Items / hr</th><th class="r">Active hrs</th><th>By hour ${H2(hours[0])}–${String(hours[hours.length - 1]).padStart(2, '0')}</th><th class="r">Last scan</th></tr></thead><tbody>
+      ${sorted.slice(0, lim).map((p, i) => { const k = cls(100 * p.rate / tgt); return `<tr><td class="r muted">${i + 1}</td><td style="max-width:220px;overflow:hidden;text-overflow:ellipsis" title="${esc(p.emp)}"><b>${esc(p.emp)}</b></td>
+        <td><div style="display:flex;align-items:center;gap:6px"><div class="prog"><i style="width:${Math.min(p.ach, 100)}%;background:var(--color-${k})"></i></div><span class="pill ${k}">${fmt(p.ach)}%</span></div></td>
+        <td class="r"><b>${fmt(p.tot)}</b></td><td class="r">${fmt(p.u)}</td><td class="r c-${k}"><b>${fmt1(p.rate)}</b></td><td class="r">${fmt1(p.urate)}</td><td class="r">${p.active}</td>
+        <td><div class="strip">${hours.map((h) => `<i style="background:${heat(p.hours[h])}" title="${H2(h)}: ${p.hours[h]} orders"></i>`).join('')}</div></td><td class="r">${esc(hhmm(p.last))}</td></tr>`; }).join('')}
+      </tbody></table></div>
+      ${sorted.length > 15 ? `<button type="button" class="ob-btn showall" style="margin-top:6px">${local.showAll[role] ? 'Show top 15' : `Show all ${sorted.length} ${person.toLowerCase()}s`}</button>` : ''}
+      <details><summary>Hour-by-hour grid with exact numbers</summary><div class="ob-tw tall"><table><thead><tr><th>${person}</th>${hours.map((h) => `<th class="r">${String(h).padStart(2, '0')}</th>`).join('')}<th class="r">Total</th></tr></thead><tbody>
+        ${[...people].sort((a, b) => b.tot - a.tot).map((p) => `<tr><td>${esc(p.emp)}</td>${hours.map((h) => `<td class="r" style="background:${p.hours[h] ? heat(p.hours[h]) : 'transparent'}">${p.hours[h] || ''}</td>`).join('')}<td class="r"><b>${fmt(p.tot)}</b></td></tr>`).join('')}</tbody>
+        <tfoot><tr><td>Total orders</td>${hr.map((r) => `<td class="r">${r.orders ? fmt(r.orders) : ''}</td>`).join('')}<td class="r">${fmt(tot)}</td></tr><tr><td>Users working</td>${hr.map((r) => `<td class="r">${r.users || ''}</td>`).join('')}<td class="r">${fmt(people.length)}</td></tr></tfoot></table></div></details>`;
+    const rk = box.querySelector('.rk'); rk.value = sortKey; rk.addEventListener('change', () => { local.sort[role] = rk.value; drawRole(role); });
+    const sa = box.querySelector('.showall'); if (sa) sa.addEventListener('click', () => { local.showAll[role] = !local.showAll[role]; drawRole(role); });
+    drawCap($('cap-' + role), hr, tgt);
+  }
+  function drawCap(box, hr, tgt) {
+    const W = Math.max(280, box.clientWidth), Ht = 220, M = { t: 16, r: 6, b: 40, l: 8 };
+    const y = d3.scaleLinear([0, Math.max(10, ...hr.map((r) => Math.max(r.orders, r.cap)))], [Ht - M.b, M.t]).nice();
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${Ht}`).attr('role', 'img').attr('aria-label', 'Orders per hour against capacity');
+    const ya = svg.append('g').call(d3.axisLeft(y).ticks(4).tickFormat(d3.format(','))); axisStyle(ya);
+    let lw = 0; ya.selectAll('text').each(function () { lw = Math.max(lw, this.getComputedTextLength()); });
+    M.l = lw + 12; ya.attr('transform', `translate(${M.l},0)`); ya.select('.domain').remove(); ya.selectAll('.tick line').attr('x2', W - M.l - M.r);
+    const x = d3.scaleBand(hr.map((r) => r.h), [M.l, W - M.r]).padding(0.25);
+    const every = x.bandwidth() < 16 ? 2 : 1;
+    const tip = tipFor(box);
+    const g = svg.append('g').selectAll('g').data(hr).join('g').attr('transform', (r) => `translate(${x(r.h)},0)`);
+    g.filter((r) => r.orders > 0).append('rect').attr('y', (r) => y(r.orders)).attr('height', (r) => y(0) - y(r.orders)).attr('width', x.bandwidth()).attr('rx', Math.min(4, x.bandwidth() / 2))
+      .attr('fill', (r) => { const p = r.cap ? 100 * r.orders / r.cap : null; return p === null ? 'var(--cds-chart-muted)' : p >= 100 ? 'var(--color-ok)' : p >= 80 ? 'var(--color-warn)' : 'var(--color-bad)'; }).attr('opacity', 0.85);
+    g.filter((r) => r.cap > 0).append('line').attr('x1', -2).attr('x2', x.bandwidth() + 2).attr('y1', (r) => y(r.cap)).attr('y2', (r) => y(r.cap)).attr('stroke', 'var(--cds-chart-reference)').attr('stroke-width', 1.5).attr('stroke-dasharray', '4 3');
+    g.filter((r, i) => i % every === 0).append('text').attr('x', x.bandwidth() / 2).attr('y', Ht - M.b + 14).attr('text-anchor', 'middle').text((r) => String(r.h).padStart(2, '0'));
+    g.filter((r, i) => i % every === 0 && r.users).append('text').attr('x', x.bandwidth() / 2).attr('y', Ht - M.b + 30).attr('text-anchor', 'middle').text((r) => r.hit + '/' + r.users);
+    
+    g.append('rect').attr('width', x.bandwidth()).attr('y', M.t).attr('height', Ht - M.b - M.t).attr('fill', 'transparent')
+      .on('mousemove', (ev, r) => tip.show(ev, H2(r.h), [[null, 'Orders', fmt(r.orders)], [null, 'Capacity', fmt(r.cap)], [null, 'Users', fmt(r.users)], [null, 'Hit target', fmt(r.hit)]]))
+      .on('mouseleave', () => tip.hide());
+  }
+  function drawProd() {
+    const s = st('people');
+    const [hf, ht] = hourRange(); const f = (get('flow') || [])[0];
+    $('prod-hint').textContent = `${f ? dlong(f.day) : (P().day ? dlong(P().day) : 'Today')}, ${H2(hf)} to ${String(ht).padStart(2, '0')}:59`;
+    if (s !== 'ok') {
+      const h = isErr(s) ? failHTML : '<div class="dash-skeleton" style="min-height:180px"></div>';
+      ['sv-pick', 'sv-pack', 'role-pick', 'role-pack'].forEach((id) => { $(id).innerHTML = h; }); return;
+    }
+    const sel = $('f-user'); const names = [...new Set(get('people').map((r) => r.emp))].sort((a, b) => String(a).localeCompare(String(b)));
+    if (local.user && !names.includes(local.user)) local.user = '';
+    sel.replaceChildren(new Option(`All users (${names.length})`, ''), ...names.map((nm) => new Option(nm, nm))); sel.value = local.user;
+    if (local.view === 'simple') { drawSimple('pick'); drawSimple('pack'); } else { drawRole('pick'); drawRole('pack'); }
+  }
+
+  // ---------- sellers ----------
+  const SEG = () => [['wait_pick', PAL()[0], 'Waiting to pick'], ['picking', `color-mix(in srgb,${PAL()[0]} 55%,transparent)`, 'Picking'], ['wait_pack', PAL()[3], 'Waiting to pack'], ['packing', `color-mix(in srgb,${PAL()[3]} 55%,transparent)`, 'Packing'], ['wait_ship', PAL()[1], 'Waiting to ship'], ['on_hold', 'var(--cds-chart-muted)', 'On hold']];
+  function drawSellers() {
+    if (!$('s-table')) return;
+    const tb = $('s-table').querySelector('tbody'), rows0 = get('sellers');
+    $('s-legend').innerHTML = SEG().map((s) => `<span><i style="background:${s[1]}"></i>${s[2]}</span>`).join('');
+    if (!rows0) { tb.replaceChildren(); const tr = document.createElement('tr'); const td = document.createElement('td'); td.colSpan = 18; td.innerHTML = isErr(st('sellers')) ? failHTML : '<div class="dash-skeleton" style="min-height:120px"></div>'; tr.appendChild(td); tb.appendChild(tr); $('s-sum').textContent = ''; return; }
+    const all = rows0.map((r) => ({ ...r }));
+    const key = local.sSort; const total = d3.sum(all, (r) => n(r.pending));
+    if (key === 'med_asc') all.sort((a, b) => n(a.med_m) - n(b.med_m) || n(b.pending) - n(a.pending)); else all.sort((a, b) => n(b[key]) - n(a[key]) || n(b.pending) - n(a.pending));
+    const byP = [...rows0].sort((a, b) => n(b.pending) - n(a.pending)), top1 = byP[0], top5 = d3.sum(byP.slice(0, 5), (r) => n(r.pending));
+    const oldS = rows0.reduce((a, r) => (n(r.oldest_m) > n(a.oldest_m) ? r : a), rows0[0] || {});
+    $('s-sum').textContent = rows0.length ? `${fmt(total)} pending orders across ${fmt(rows0.length)} sellers. Biggest: ${top1.seller} with ${fmt(top1.pending)} (${fmt1(top1.share_pct)}%). Top 5 sellers hold ${fmt1(100 * top5 / Math.max(total, 1))}% of pending. Oldest order: ${oldS.seller}, ${dur(oldS.oldest_m)}.` : 'No pending orders.';
+    let rows = all; if (local.sFind) rows = rows.filter((r) => String(r.seller).toLowerCase().includes(local.sFind));
+    const maxP = Math.max(1, ...all.map((r) => n(r.pending)));
+    tb.replaceChildren(...rows.map((r) => {
+      const tr = document.createElement('tr');
+      const td = (txt, c) => { const e = document.createElement('td'); e.textContent = txt; if (c) e.className = c; tr.appendChild(e); return e; };
+      td(r.seller).style.fontWeight = '500';
+      const pc = td(fmt(r.pending), 'r');
+      const bar = document.createElement('div'); bar.className = 'stack'; bar.style.width = Math.max(4, 100 * n(r.pending) / maxP) + '%'; bar.style.marginLeft = 'auto';
+      SEG().forEach(([k, col]) => { if (n(r[k])) { const i = document.createElement('i'); i.style.width = 100 * n(r[k]) / n(r.pending) + '%'; i.style.background = col; bar.appendChild(i); } });
+      pc.appendChild(bar);
+      td(fmt1(r.share_pct) + '%', 'r');
+      ['wait_pick', 'picking', 'wait_pack', 'packing', 'wait_ship', 'on_hold'].forEach((k) => td(fmt(r[k]), 'r'));
+      td(fmt(r.breached), 'r' + (n(r.breached) ? ' c-bad' : ''));
+      td(fmt(r.due_today), 'r'); td(fmt(r.created_today), 'r'); td(fmt(r.units), 'r');
+      td(dur(r.oldest_m), 'r ' + (n(r.oldest_m) >= 1440 ? 'c-bad' : n(r.oldest_m) >= 480 ? 'c-warn' : ''));
+      td(dur(r.newest_m), 'r');
+      td(dur(r.med_m), 'r ' + (n(r.med_m) >= 1440 ? 'c-bad' : n(r.med_m) >= 480 ? 'c-warn' : 'c-ok'));
+      td(fmt(r.over24), 'r' + (n(r.over24) ? ' c-bad' : ''));
+      td(dmy(r.oldest_created), 'r');
+      return tr;
+    }));
+    if (!rows.length) { const tr = document.createElement('tr'); const c = document.createElement('td'); c.colSpan = 18; c.className = 'muted'; c.textContent = 'No seller matches that name.'; tr.appendChild(c); tb.appendChild(tr); }
+  }
+
+  function drawSteps() {
+    const tb = $('step-times').querySelector('tbody'), cy = get('cycle');
+    $('day-totals-hint').textContent = 'Everything done on ' + dlong(P().day || cairoToday());
+    if (!cy) { tb.replaceChildren(); const tr = document.createElement('tr'); const td = document.createElement('td'); td.colSpan = 5; td.innerHTML = isErr(st('cycle')) ? failHTML : '<div class="dash-skeleton" style="min-height:80px"></div>'; tr.appendChild(td); tb.appendChild(tr); return; }
+    const LBL = { pick: 'Created → picked', pack: 'Picked → packed', ship: 'Packed → shipped', total: 'Created → shipped' };
+    tb.replaceChildren(...cy.map((r) => {
+      const tr = document.createElement('tr'); tr.dataset.key = r.stage;
+      const pct = n(r.n) ? 100 * n(r.in_target) / n(r.n) : null;
+      [LBL[r.stage] || r.stage, fmt(r.n), dur(r.med_m), dur(r.avg_m), fmt(r.in_target) + (pct === null ? '' : ` (${fmt1(pct)}%)`)].forEach((v, i) => { const td = document.createElement('td'); td.textContent = v; if (i) td.className = 'r'; tr.appendChild(td); });
+      return tr;
+    }));
+  }
+
+  root.addEventListener('click', (ev) => {
+    const b = ev.target.closest('#tr-sw button'); if (!b) return;
+    local.grain = b.dataset.g; drawMonthly();
+  });
+  function drawMonthly() {
+    const box = $('tr-chart'); if (!box) return;
+    const G = local.grain, NAME = { day: 'day', week: 'week', month: 'month' }[G];
+    root.querySelectorAll('#tr-sw button').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.g === G)));
+    $('tr-sw-c').style.background = PAL()[0];
+    $('tr-title').textContent = 'Total per ' + NAME;
+    $('m-col').textContent = G === 'day' ? 'Day' : G === 'week' ? 'Week (Sat–Fri)' : 'Month';
+    $('tr-hint').textContent = G === 'day' ? 'B2C orders, last 60 days (Cairo time).' : G === 'week' ? 'B2C orders, last 26 weeks, Saturday to Friday.' : 'B2C orders, last 12 months.';
+    const tb = $('m-table').querySelector('tbody');
+    if (!chartState(box, 'totals')) { tb.replaceChildren(); return; }
+    const rows = get('totals').filter((r) => r.grain === G).map((r) => ({ ...r, dt: new Date((G === 'month' ? r.period + '-01' : r.period) + 'T00:00:00Z') })).sort((a, b) => a.dt - b.dt);
+    box.replaceChildren();
+    if (!rows.length) { box.innerHTML = '<div class="ob-empty">No data in this period.</div>'; tb.replaceChildren(); return; }
+    const today = cairoToday(), cur = G === 'day' ? today : G === 'month' ? today.slice(0, 7) : rows[rows.length - 1].period;
+    const isPartial = (r) => r.period === cur;
+    const lab = (r) => G === 'month' ? MON[Number(r.period.slice(5, 7)) - 1] + ' ' + r.period.slice(0, 4) : G === 'week' ? 'Week of ' + dlong(r.period) : dlong(r.period);
+    // table, newest first
+    tb.replaceChildren(...[...rows].reverse().map((r) => {
+      const tr = document.createElement('tr'); tr.dataset.key = r.k;
+      const vals = [lab(r) + (isPartial(r) ? ' (to date)' : ''), fmt(r.due), fmt(r.on_time), r.cot_pct === null ? '—' : fmt1(r.cot_pct) + '%', fmt(r.breaches), fmt(r.picked), fmt(r.picked_i), fmt(r.pickers), fmt(r.packed), fmt(r.packed_i), fmt(r.packers), fmt(r.shipped), fmt(r.shipped_i), fmt(r.ship_days), fmt(r.shipped_per_day)];
+      vals.forEach((v, i) => { const td = document.createElement('td'); td.textContent = v; if (i) td.className = 'r'; if (i === 0) td.style.fontWeight = '500';
+        if (i === 3 && r.cot_pct !== null) td.className = 'r ' + (r.cot_pct >= 95 ? 'c-ok' : r.cot_pct >= 80 ? 'c-warn' : 'c-bad');
+        if (i === 4 && n(r.breaches)) td.className = 'r c-bad'; tr.appendChild(td); });
+      return tr;
+    }));
+    // curve
+    const full = rows.filter((r) => !isPartial(r)); const avg = full.length ? d3.mean(full, (r) => n(r.shipped)) : null;
+    const W = Math.max(280, box.clientWidth), Ht = 260, M = { t: 16, r: 14, b: 26, l: 8 };
+    const y = d3.scaleLinear([0, Math.max(10, d3.max(rows, (r) => n(r.shipped)))], [Ht - M.b, M.t]).nice();
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${Ht}`).attr('role', 'img').attr('aria-label', 'Orders shipped over time');
+    const ya = svg.append('g').call(d3.axisLeft(y).ticks(5).tickFormat(d3.format('~s'))); axisStyle(ya);
+    let lw = 0; ya.selectAll('text').each(function () { lw = Math.max(lw, this.getComputedTextLength()); });
+    M.l = lw + 12; ya.attr('transform', `translate(${M.l},0)`); ya.select('.domain').remove(); ya.selectAll('.tick line').attr('x2', W - M.l - M.r);
+    const ext = d3.extent(rows, (r) => r.dt);
+    const x = d3.scaleUtc(+ext[0] === +ext[1] ? [new Date(+ext[0] - 864e5), new Date(+ext[1] + 864e5)] : ext, [M.l + 6, W - M.r]);
+    const ticks = G === 'month' ? rows.map((r) => r.dt) : x.ticks(W < 520 ? 4 : 8);
+    const xa = svg.append('g').attr('transform', `translate(0,${Ht - M.b})`).call(d3.axisBottom(x).tickValues(ticks).tickFormat(G === 'month' ? d3.utcFormat('%b') : d3.utcFormat('%b %-d')).tickSize(0).tickPadding(8)); axisStyle(xa);
+    if (avg !== null) {
+      svg.append('line').attr('x1', M.l).attr('x2', W - M.r).attr('y1', y(avg)).attr('y2', y(avg)).attr('stroke', 'var(--cds-chart-reference)').attr('stroke-dasharray', '5 4');
+      svg.append('text').attr('y', y(avg) - 5).attr('text-anchor', 'end').attr('x', W - M.r).text('Avg ' + fmt(avg));
+    }
+    const line = d3.line().x((r) => x(r.dt)).y((r) => y(n(r.shipped)));
+    svg.append('path').attr('d', line(full)).attr('fill', 'none').attr('stroke', PAL()[0]).attr('stroke-width', 2).attr('stroke-linejoin', 'round').attr('stroke-linecap', 'round');
+    const last = rows[rows.length - 1];
+    if (isPartial(last) && full.length) svg.append('path').attr('d', line([full[full.length - 1], last])).attr('fill', 'none').attr('stroke', PAL()[0]).attr('stroke-width', 2).attr('stroke-dasharray', '3 3');
+    if (rows.length <= 40) svg.append('g').selectAll('circle').data(full).join('circle').attr('cx', (r) => x(r.dt)).attr('cy', (r) => y(n(r.shipped))).attr('r', 2.5).attr('fill', PAL()[0]);
+    if (isPartial(last)) svg.append('circle').attr('cx', x(last.dt)).attr('cy', y(n(last.shipped))).attr('r', 4).attr('fill', 'var(--color-panel)').attr('stroke', PAL()[0]).attr('stroke-width', 2);
+    const tip = tipFor(box);
+    const dot = svg.append('circle').attr('r', 4.5).attr('fill', PAL()[0]).attr('opacity', 0);
+    const bis = d3.bisector((r) => r.dt).center;
+    svg.append('rect').attr('x', M.l).attr('y', M.t).attr('width', W - M.l - M.r).attr('height', Ht - M.t - M.b).attr('fill', 'transparent')
+      .on('mousemove', (ev) => { const [mx] = d3.pointer(ev); const r = rows[bis(rows, x.invert(mx))]; dot.attr('cx', x(r.dt)).attr('cy', y(n(r.shipped))).attr('opacity', 1);
+        tip.show(ev, lab(r) + (isPartial(r) ? ' (in progress)' : ''), [[PAL()[0], 'Orders shipped', fmt(r.shipped)], [null, 'COT %', r.cot_pct === null ? '—' : fmt1(r.cot_pct) + '%'], [null, 'Breaches', fmt(r.breaches)]]); })
+      .on('mouseleave', () => { dot.attr('opacity', 0); tip.hide(); });
+  }
+
+  function drawAll() {
+    syncControls();
+    drawMonthly();
+    drawSteps();
+    fillMarks();
+    drawTop();
+    drawAging();
+    drawHourly();
+    drawPace();
+    drawProd();
+    drawSellers();
+  }
+  dash.onData(drawAll);
+})();
+</script>
